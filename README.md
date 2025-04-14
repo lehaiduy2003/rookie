@@ -3,7 +3,7 @@
 ## Project Description
 This project is an e-commerce web application built using **Java**, **Spring Boot**, and **Maven**. It provides functionality for both customers and administrators. The application demonstrates the use of various techniques and includes unit tests to showcase testing capabilities.
 <br/>
-**ERD**: https://dbdocs.io/lehaiduy2003/rookie-assignment
+**dbdocs**: https://dbdocs.io/lehaiduy2003/rookie-assignment
 ---
 
 ## Features
