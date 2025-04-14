@@ -64,6 +64,20 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -113,7 +127,7 @@
                     <targetJdk>21</targetJdk>
                     <skipEmptyReport>false</skipEmptyReport>
                     <linkXRef>false</linkXRef>
-                    <!-- Bật CPD -->
+                    <!-- CPD -->
                     <skipPmdError>true</skipPmdError>
                     <printFailingErrors>true</printFailingErrors>
                     <includeTests>true</includeTests>
