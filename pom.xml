@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>asignment</artifactId>
+    <artifactId>assignment</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>asignment</name>
-    <description>asignment</description>
+    <name>assignment</name>
+    <description>assignment</description>
     <url/>
     <licenses>
         <license/>
