@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>asignment</artifactId>
+    <artifactId>assignment</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>asignment</name>
-    <description>asignment</description>
+    <name>assignment</name>
+    <description>assignment</description>
     <url/>
     <licenses>
         <license/>
@@ -91,6 +91,65 @@
                         </exclude>
                     </excludes>
                 </configuration>
+            </plugin>
+            <!-- Plugin Javadoc -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.4.1</version>
+                <configuration>
+                    <show>private</show>
+                    <nohelp>true</nohelp>
+                </configuration>
+            </plugin>
+
+            <!-- Plugin PMD (include CPD) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.19.0</version>
+                <configuration>
+                    <minimumTokens>100</minimumTokens>
+                    <targetJdk>21</targetJdk>
+                    <skipEmptyReport>false</skipEmptyReport>
+                    <linkXRef>false</linkXRef>
+                    <!-- Bật CPD -->
+                    <skipPmdError>true</skipPmdError>
+                    <printFailingErrors>true</printFailingErrors>
+                    <includeTests>true</includeTests>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                            <goal>cpd-check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Plugin Checkstyle -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <configLocation>google_checks.xml</configLocation>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                    <linkXRef>false</linkXRef>
+                    <maxAllowedViolations>50</maxAllowedViolations>
+                    <violationSeverity>warning</violationSeverity>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
