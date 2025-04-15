@@ -13,7 +13,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Rating extends BaseEntity {
-    @Min(value = 0, message = "Score must be at least 0")
+    @Min(value = 1, message = "Score must be at least 1")
     @Max(value = 5, message = "Score must be at most 5")
     private double score;
     private String comment;
@@ -23,4 +23,10 @@ public class Rating extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
+
+    @Override
+    public void prePersist() {
+        super.prePersist();
+        score = 0; // Default value
+    }
 }
