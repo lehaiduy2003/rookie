@@ -101,7 +101,7 @@ public class UserServiceImpl implements UserService {
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
         Page<User> userPages = userRepository.findAll(paging);
         if (userPages.hasContent()) {
-            return userMapper.toPagingResult(userPages);
+            return userMapper.toPagingResult(userPages, userMapper::toDto);
         } else {
             throw new UsernameNotFoundException("No users found");
         }
