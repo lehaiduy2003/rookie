@@ -35,14 +35,14 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public PagingResult<UserDtoRes> getPageableCustomersByTier(String memberTier, Integer pageNo, Integer pageSize, String sortBy) {
+    public PagingResult<UserDtoRes> getCustomersByTier(String memberTier, Integer pageNo, Integer pageSize, String sortBy) {
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
         Page<Customer> customerPage = customerRepository.findByMemberTier(MemberTier.valueOf(memberTier), paging);
         return userMapper.toPagingResult(customerPage, userMapper::toDto);
     }
 
     @Override
-    public PagingResult<UserDtoRes> getPageableCustomers(Integer pageNo, Integer pageSize, String sortBy) {
+    public PagingResult<UserDtoRes> getCustomers(Integer pageNo, Integer pageSize, String sortBy) {
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
         Page<Customer> customerPage = customerRepository.findAll(paging);
         return userMapper.toPagingResult(customerPage, userMapper::toDto);

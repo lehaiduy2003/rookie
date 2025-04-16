@@ -21,7 +21,7 @@ public class CustomerController {
         @RequestParam(defaultValue = "10") Integer pageSize,
         @RequestParam(defaultValue = "id") String sortBy) {
         try {
-            PagingResult<UserDtoRes> customers = customerService.getPageableCustomers(pageNo, pageSize, sortBy);
+            PagingResult<UserDtoRes> customers = customerService.getCustomers(pageNo, pageSize, sortBy);
             return ResponseEntity.ok(customers);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
@@ -35,7 +35,7 @@ public class CustomerController {
         @RequestParam(defaultValue = "10") Integer pageSize,
         @RequestParam(defaultValue = "id") String sortBy) {
         try {
-            PagingResult<UserDtoRes> customers = customerService.getPageableCustomersByTier(memberTier, pageNo, pageSize, sortBy);
+            PagingResult<UserDtoRes> customers = customerService.getCustomersByTier(memberTier, pageNo, pageSize, sortBy);
             return ResponseEntity.ok(customers);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();

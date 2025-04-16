@@ -9,7 +9,7 @@ import com.example.assignment.dto.response.UserDtoRes;
 public interface CustomerService {
     /**
      * Update the member tier of a customer.
-     * this method has no return value, the controller should return no content response.
+     * This method has no return value, the controller should return no content response.
      * @param customerId the ID of the customer whose member tier is to be updated
      * @param memberTier the new member tier to be set
      */
@@ -23,7 +23,7 @@ public interface CustomerService {
      * @param sortBy the field to sort by
      * @return a pageable result of customers with the specified member tier
      */
-    PagingResult<UserDtoRes> getPageableCustomersByTier(String memberTier, Integer pageNo, Integer pageSize, String sortBy);
+    PagingResult<UserDtoRes> getCustomersByTier(String memberTier, Integer pageNo, Integer pageSize, String sortBy);
 
     /**
      * Get a list of customers with pagination and sorting.
@@ -32,6 +32,6 @@ public interface CustomerService {
      * @param sortBy the field to sort by
      * @return a pageable result of customers
      */
-    PagingResult<UserDtoRes> getPageableCustomers(Integer pageNo, Integer pageSize, String sortBy);
+    PagingResult<UserDtoRes> getCustomers(Integer pageNo, Integer pageSize, String sortBy);
 
 }
