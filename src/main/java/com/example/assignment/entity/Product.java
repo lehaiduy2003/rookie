@@ -19,9 +19,17 @@ public class Product extends BaseEntityAudit {
     private int quantity;
     @Column(name = "image_url")
     private String imageUrl;
-    private boolean isActive;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @Column(name = "is_active")
+    private Boolean isActive;
+    @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
     // Add any additional fields or relationships as needed
+
+
+    @Override
+    public void prePersist() {
+        super.prePersist();
+        this.isActive = true; // Set default value for isActive
+    }
 }
