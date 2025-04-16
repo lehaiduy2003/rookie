@@ -1,17 +1,17 @@
 package com.example.assignment.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.util.Date;
 
 @Entity
 @Table(name = "user_profiles")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class UserProfile {
     @Id
     private Long id;
@@ -29,5 +29,6 @@ public class UserProfile {
     @OneToOne
     @MapsId
     @JoinColumn(name = "id")
+    @JsonIgnore
     private User user;
 }

@@ -5,7 +5,7 @@ import lombok.*;
 
 @Entity
 @Table(name = "products")
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy = InheritanceType.JOINED)
 @Getter
 @Setter
 @Builder
@@ -20,9 +20,6 @@ public class Product extends BaseEntityAudit {
     @Column(name = "image_url")
     private String imageUrl;
     private boolean isActive;
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "owner_id", nullable = false)
-    private ShopOwner shopOwner;
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
