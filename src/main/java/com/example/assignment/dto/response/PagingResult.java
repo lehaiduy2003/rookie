@@ -1,11 +1,13 @@
 package com.example.assignment.dto.response;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Collection;
 
 @Data
+@Builder
 @NoArgsConstructor
 public class PagingResult<T> {
 

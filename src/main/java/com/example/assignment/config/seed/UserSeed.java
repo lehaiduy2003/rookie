@@ -32,16 +32,16 @@ public class UserSeed implements CommandLineRunner {
     }
 
     private UserCreationReq buildUserCreationReq(String email, String phoneNumber, String password, String firstName, String lastName, String address, Role role, @Nullable MemberTier memberTier) {
-        UserCreationReq userCreationReq = new UserCreationReq();
-        userCreationReq.setEmail(email);
-        userCreationReq.setPhoneNumber(phoneNumber);
-        userCreationReq.setPassword(PasswordEncoderConfig.passwordEncoder().encode(password));
-        userCreationReq.setFirstName(firstName);
-        userCreationReq.setAddress(address);
-        userCreationReq.setLastName(lastName);
-        userCreationReq.setRole(role);
-        userCreationReq.setMemberTier(memberTier);
-        return userCreationReq;
+        return UserCreationReq.builder()
+            .email(email)
+            .phoneNumber(phoneNumber)
+            .password(PasswordEncoderConfig.passwordEncoder().encode(password))
+            .firstName(firstName)
+            .lastName(lastName)
+            .address(address)
+            .role(role)
+            .memberTier(memberTier)
+            .build();
     }
 
     private UserProfile buildUserProfile(UserCreationReq userCreationReq) {
