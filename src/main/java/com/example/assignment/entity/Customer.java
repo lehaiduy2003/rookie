@@ -22,4 +22,6 @@ public class Customer extends User {
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude
     private Set<ShippingAddress> shippingAddresses;
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Cart cart;
 }
