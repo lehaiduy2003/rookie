@@ -1,11 +1,13 @@
 package com.example.assignment.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.Date;
 
 @Data
+@Builder
 public class UserInfoUpdatingReq {
     private String firstName;
     private String lastName;
