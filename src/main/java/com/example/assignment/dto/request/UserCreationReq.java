@@ -4,11 +4,13 @@ import com.example.assignment.enums.MemberTier;
 import com.example.assignment.enums.Role;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Email;
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.Date;
 
 @Data
+@Builder
 public class UserCreationReq {
     @Email
     private String email;
