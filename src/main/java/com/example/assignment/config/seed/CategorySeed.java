@@ -32,9 +32,13 @@ public class CategorySeed implements CommandLineRunner {
             .name("Fashion")
             .description("Clothing and accessories")
             .build();
+        Category others = Category.builder()
+            .name("Others")
+            .description("Miscellaneous items")
+            .build();
 
         // Save parent categories
-        categoryRepository.saveAll(List.of(electronics, fashion));
+        categoryRepository.saveAll(List.of(electronics, fashion, others));
 
         // Create child categories for Electronics
         Category mobiles = Category.builder()

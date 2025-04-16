@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 /**
  * Mapper interface for converting between UserProfile entity and DTOs.
  * This mapper used by UserMapper to convert UserCreation and UserInfoUpdating DTOs to UserProfile entity.
- * Component model is set to "spring" to allow for dependency injection.
+ * The component model is set to "spring" to allow for dependency injection.
  */
 @Mapper(componentModel = "spring")
 public interface UserProfileMapper {

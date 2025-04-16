@@ -1,7 +1,6 @@
 package com.example.assignment.mapper;
 
 import com.example.assignment.dto.request.UserCreationReq;
-import com.example.assignment.dto.response.PagingResult;
 import com.example.assignment.dto.response.UserDtoRes;
 import com.example.assignment.entity.Customer;
 import com.example.assignment.entity.User;
@@ -9,17 +8,15 @@ import com.example.assignment.entity.UserProfile;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.SubclassMapping;
-import org.springframework.data.domain.Page;
-
-import java.util.List;
 
 /**
  * Mapper interface for converting between User entity and DTOs.
  * This interface uses MapStruct to generate the implementation at compile time.
- * Component model is set to "spring" to allow for dependency injection.
+ * The component model is set to "spring" to allow for dependency injection.
+ * This mapper extends PagingResultMapper to provide pagination support.
  */
 @Mapper(componentModel = "spring", uses = {UserProfileMapper.class})
-public interface UserMapper {
+public interface UserMapper extends PagingResultMapper {
     /**
      * Converts a UserCreation DTO to a User entity.
      *
@@ -37,6 +34,7 @@ public interface UserMapper {
      * @param user the User entity
      * @return the User DTO response
      */
+    // for destructuring the UserProfile entity to UserDtoRes
     @Mapping(source = "user.userProfile.firstName", target = "firstName")
     @Mapping(source = "user.userProfile.lastName", target = "lastName")
     @Mapping(source = "user.userProfile.phoneNumber", target = "phoneNumber")
@@ -58,23 +56,4 @@ public interface UserMapper {
     @Mapping(target = "userProfile", source = "userProfile")
     Customer toCustomer(UserCreationReq userCreationReq, UserProfile userProfile);
 
-    /**
-     * Converts a userPage to a page of User DTOs.
-     *
-     * @param userPage the page of ? entity which extends from User entity
-     * @return the paging result of User DTOs
-     */
-    default PagingResult<UserDtoRes> toPagingResult(Page<? extends User> userPage) {
-        List<UserDtoRes> userDtoList = userPage.getContent().stream()
-            .map(this::toDto)
-            .toList();
-        return new PagingResult<>(
-            userDtoList,
-            userPage.getTotalPages(),
-            userPage.getTotalElements(),
-            userPage.getSize(),
-            userPage.getNumber(),
-            userPage.isEmpty()
-        );
-    }
 }
