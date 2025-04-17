@@ -1,7 +1,7 @@
 package com.example.assignment.controller;
 
-import com.example.assignment.dto.request.CategoryDtoReq;
-import com.example.assignment.dto.response.CategoryDtoRes;
+import com.example.assignment.dto.request.CategoryCreationReq;
+import com.example.assignment.dto.response.CategoryRes;
 import com.example.assignment.dto.response.CategoryTreeRes;
 import com.example.assignment.service.CategoryService;
 import jakarta.validation.Valid;
@@ -20,9 +20,9 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<CategoryDtoRes> createCategory(@Valid @RequestBody CategoryDtoReq categoryDtoReq) {
+    public ResponseEntity<CategoryRes> createCategory(@Valid @RequestBody CategoryCreationReq categoryCreationReq) {
         try {
-            CategoryDtoRes createdCategory = categoryService.createCategory(categoryDtoReq);
+            CategoryRes createdCategory = categoryService.createCategory(categoryCreationReq);
             return ResponseEntity.status(201).body(createdCategory);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
@@ -30,9 +30,9 @@ public class CategoryController {
     }
 
     @PutMapping("/{categoryId}")
-    public ResponseEntity<CategoryDtoRes> updateCategory(@PathVariable Long categoryId, @Valid @RequestBody CategoryDtoReq categoryDtoReq) {
+    public ResponseEntity<CategoryRes> updateCategory(@PathVariable Long categoryId, @Valid @RequestBody CategoryCreationReq categoryCreationReq) {
         try {
-            CategoryDtoRes updatedCategory = categoryService.updateCategoryById(categoryId, categoryDtoReq);
+            CategoryRes updatedCategory = categoryService.updateCategoryById(categoryId, categoryCreationReq);
             return ResponseEntity.ok(updatedCategory);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
@@ -60,9 +60,9 @@ public class CategoryController {
     }
 
     @GetMapping("/{categoryId}")
-    public ResponseEntity<CategoryDtoRes> getCategoryById(@PathVariable Long categoryId) {
+    public ResponseEntity<CategoryRes> getCategoryById(@PathVariable Long categoryId) {
         try {
-            CategoryDtoRes category = categoryService.getCategoryById(categoryId);
+            CategoryRes category = categoryService.getCategoryById(categoryId);
             return ResponseEntity.ok(category);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
