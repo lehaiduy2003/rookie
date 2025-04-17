@@ -12,12 +12,9 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FeatureProduct extends Product {
+public class FeaturedProduct extends Product {
     private Date startDate;
     private Date endDate;
     @Enumerated(EnumType.STRING)
     private ProductPriority priority;
-    @OneToOne
-    @JoinColumn(name = "product_id", nullable = false, unique = true)
-    private Product product;
 }

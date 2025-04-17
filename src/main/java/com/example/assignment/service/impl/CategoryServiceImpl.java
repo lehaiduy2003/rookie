@@ -1,32 +1,29 @@
 package com.example.assignment.service.impl;
 
-import com.example.assignment.dto.request.CategoryDtoReq;
-import com.example.assignment.dto.response.CategoryDtoRes;
+import com.example.assignment.dto.request.CategoryCreationReq;
+import com.example.assignment.dto.response.CategoryRes;
 import com.example.assignment.dto.response.CategoryTreeRes;
 import com.example.assignment.entity.Category;
 import com.example.assignment.mapper.CategoryMapper;
 import com.example.assignment.repository.CategoryRepository;
 import com.example.assignment.service.CategoryService;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
 @Service
+@RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository, CategoryMapper categoryMapper) {
-        this.categoryRepository = categoryRepository;
-        this.categoryMapper = categoryMapper;
-    }
-
     @Override
     @Transactional
-    public CategoryDtoRes createCategory(CategoryDtoReq categoryDtoReq) {
-        Long parentId = categoryDtoReq.getParentId();
-        Category category = categoryMapper.toEntity(categoryDtoReq);
+    public CategoryRes createCategory(CategoryCreationReq categoryCreationReq) {
+        Long parentId = categoryCreationReq.getParentId();
+        Category category = categoryMapper.toEntity(categoryCreationReq);
         // check if parentId is not null and exists in the database to set the parent category
         setParentCategory(category, parentId);
         Category savedCategory = categoryRepository.save(category);
@@ -35,11 +32,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public CategoryDtoRes updateCategoryById(Long categoryId, CategoryDtoReq categoryDtoReq) {
+    public CategoryRes updateCategoryById(Long categoryId, CategoryCreationReq categoryCreationReq) {
         // check if parentId is not equal to categoryId
-        Long parentId = categoryDtoReq.getParentId();
-        String name = categoryDtoReq.getName();
-        String description = categoryDtoReq.getDescription();
+        Long parentId = categoryCreationReq.getParentId();
+        String name = categoryCreationReq.getName();
+        String description = categoryCreationReq.getDescription();
         if(Objects.equals(parentId, categoryId)) {
             throw new IllegalArgumentException("Parent ID cannot be the same as Category ID");
         }
@@ -48,8 +45,8 @@ public class CategoryServiceImpl implements CategoryService {
             () -> new IllegalArgumentException("Category not found")
         );
         // update category details if they are not null
-        category.setName(categoryDtoReq.getName() != null ? name : category.getName());
-        category.setDescription(categoryDtoReq.getDescription() != null ? description : category.getDescription());
+        category.setName(categoryCreationReq.getName() != null ? name : category.getName());
+        category.setDescription(categoryCreationReq.getDescription() != null ? description : category.getDescription());
         // check if parentId is not null and exists in the database to set the parent category
         setParentCategory(category, parentId);
         Category updatedCategory = categoryRepository.save(category);
@@ -79,12 +76,12 @@ public class CategoryServiceImpl implements CategoryService {
         categoryRepository.deleteById(categoryId);
     }
     @Override
-    public CategoryDtoRes getCategoryById(Long categoryId) {
+    public CategoryRes getCategoryById(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
             .orElseThrow(() -> new IllegalArgumentException("Category not found"));
 
         // Map the category entity to DTO
-        return CategoryDtoRes.builder()
+        return CategoryRes.builder()
             .id(category.getId())
             .name(category.getName())
             .description(category.getDescription())

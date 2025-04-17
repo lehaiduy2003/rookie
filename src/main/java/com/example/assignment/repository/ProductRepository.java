@@ -6,7 +6,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 /**
@@ -43,4 +45,20 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @NonNull
     @EntityGraph(attributePaths = {"category"})
     Optional<Product> findById(@NonNull Long id);
+
+    /**
+     * Updates the average rating and rating count of a product.
+     * This method is used to update the product's average rating after a new rating is added.
+     * It uses a native SQL query to perform the update. So this method does not need to save the product entity.
+     * @param productId the ID of the product to update
+     * @param score the score to add to the product's average rating
+     */
+    @Modifying
+    @Query(value = """
+  UPDATE products\s
+  SET average_rating = ((average_rating * rating_count + :score) / (rating_count + 1)),
+      rating_count = rating_count + 1
+  WHERE id = :productId
+""", nativeQuery = true)
+    void updateProductRating(@Param("productId") Long productId, @Param("score") double score);
 }
