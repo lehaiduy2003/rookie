@@ -3,6 +3,8 @@ package com.example.assignment.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "products")
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -16,6 +18,10 @@ public class Product extends BaseEntityAudit {
     private String name;
     private String description;
     private double price;
+    @Column(name = "average_rating")
+    private double avgRating;
+    @Column(name = "rating_count")
+    private long ratingCount;
     private int quantity;
     @Column(name = "image_url")
     private String imageUrl;
@@ -26,10 +32,16 @@ public class Product extends BaseEntityAudit {
     private Category category;
     // Add any additional fields or relationships as needed
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ToString.Exclude
+    private Set<Rating> ratings;
+
 
     @Override
     public void prePersist() {
         super.prePersist();
         this.isActive = true; // Set default value for isActive
+        this.avgRating = 0.0; // Set default value for avgRating
+        this.ratingCount = 0; // Set default value for ratingCount
     }
 }
