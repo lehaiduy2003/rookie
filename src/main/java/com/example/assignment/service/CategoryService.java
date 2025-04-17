@@ -1,7 +1,7 @@
 package com.example.assignment.service;
 
-import com.example.assignment.dto.request.CategoryDtoReq;
-import com.example.assignment.dto.response.CategoryDtoRes;
+import com.example.assignment.dto.request.CategoryCreationReq;
+import com.example.assignment.dto.response.CategoryRes;
 import com.example.assignment.dto.response.CategoryTreeRes;
 
 import java.util.List;
@@ -15,20 +15,20 @@ public interface CategoryService {
     /**
      * Creates a new category.
      *
-     * @param categoryDtoReq the request object containing category creation details
+     * @param categoryCreationReq the request object containing category creation details
      * @return the created Category object
      */
-    CategoryDtoRes createCategory(CategoryDtoReq categoryDtoReq);
+    CategoryRes createCategory(CategoryCreationReq categoryCreationReq);
 
     /**
      * Updates an existing category.
      * It can update the parent ID category as well.
      *
      * @param categoryId the ID of the category to be updated
-     * @param categoryDtoReq the request object containing updated category details
+     * @param categoryCreationReq the request object containing updated category details
      * @return the updated Category object
      */
-    CategoryDtoRes updateCategoryById(Long categoryId, CategoryDtoReq categoryDtoReq);
+    CategoryRes updateCategoryById(Long categoryId, CategoryCreationReq categoryCreationReq);
 
     /**
      * Deletes a category.
@@ -51,7 +51,7 @@ public interface CategoryService {
      * @param categoryId the ID of the category to be retrieved
      * @return the Category object with the specified ID
      */
-    CategoryDtoRes getCategoryById(Long categoryId);
+    CategoryRes getCategoryById(Long categoryId);
 
 
     /**

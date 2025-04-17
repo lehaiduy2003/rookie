@@ -9,7 +9,7 @@ import java.util.Collection;
 @Data
 @Builder
 @NoArgsConstructor
-public class PagingResult<T> {
+public class PagingRes<T> {
 
     private Collection<T> content;
     private Integer totalPages;
@@ -18,7 +18,7 @@ public class PagingResult<T> {
     private Integer page;
     private boolean empty;
 
-    public PagingResult(Collection<T> content, Integer totalPages, long totalElements, Integer size, Integer page, boolean empty) {
+    public PagingRes(Collection<T> content, Integer totalPages, long totalElements, Integer size, Integer page, boolean empty) {
         this.content = content;
         this.totalPages = totalPages;
         this.totalElements = totalElements;

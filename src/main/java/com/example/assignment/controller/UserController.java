@@ -1,10 +1,11 @@
 package com.example.assignment.controller;
 
-import com.example.assignment.dto.response.PagingResult;
+import com.example.assignment.dto.response.PagingRes;
+import com.example.assignment.dto.response.UserDetailsRes;
+import com.example.assignment.dto.response.UserRes;
 import com.example.assignment.service.UserService;
 import com.example.assignment.dto.request.UserCreationReq;
 import com.example.assignment.dto.request.UserInfoUpdatingReq;
-import com.example.assignment.dto.response.UserDtoRes;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,9 +21,9 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDtoRes> createUser(@Valid @RequestBody UserCreationReq userCreationReq) {
+    public ResponseEntity<UserRes> createUser(@Valid @RequestBody UserCreationReq userCreationReq) {
         try {
-            UserDtoRes createdUser = userService.createUser(userCreationReq);
+            UserRes createdUser = userService.createUser(userCreationReq);
             return ResponseEntity.status(201).body(createdUser);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
@@ -30,9 +31,9 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDtoRes> updateUser(@PathVariable Long id, @Valid @RequestBody UserInfoUpdatingReq userInfoUpdatingReq) {
+    public ResponseEntity<UserRes> updateUser(@PathVariable Long id, @Valid @RequestBody UserInfoUpdatingReq userInfoUpdatingReq) {
         try {
-            UserDtoRes updatedUser = userService.updateUserById(id, userInfoUpdatingReq);
+            UserRes updatedUser = userService.updateUserById(id, userInfoUpdatingReq);
             return ResponseEntity.ok(updatedUser);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
@@ -51,12 +52,14 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<PagingResult<UserDtoRes>> getPageableUsers(
+    public ResponseEntity<PagingRes<UserRes>> getPageableUsers(
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
-            @RequestParam(defaultValue = "id") String sortBy) {
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir
+    ) {
         try {
-            PagingResult<UserDtoRes> users = userService.getUsers(pageNo, pageSize, sortBy);
+            PagingRes<UserRes> users = userService.getUsers(pageNo, pageSize, sortDir, sortBy);
             return ResponseEntity.ok(users);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
@@ -64,9 +67,9 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDtoRes> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserDetailsRes> getUserById(@PathVariable Long id) {
         try {
-            UserDtoRes user = userService.getUserById(id);
+            UserDetailsRes user = userService.getUserById(id);
             return ResponseEntity.ok(user);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
