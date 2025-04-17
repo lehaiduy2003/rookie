@@ -1,7 +1,8 @@
 package com.example.assignment.mapper;
 
 import com.example.assignment.dto.request.UserCreationReq;
-import com.example.assignment.dto.response.UserDtoRes;
+import com.example.assignment.dto.response.UserDetailsRes;
+import com.example.assignment.dto.response.UserRes;
 import com.example.assignment.entity.Customer;
 import com.example.assignment.entity.User;
 import com.example.assignment.entity.UserProfile;
@@ -13,10 +14,10 @@ import org.mapstruct.SubclassMapping;
  * Mapper interface for converting between User entity and DTOs.
  * This interface uses MapStruct to generate the implementation at compile time.
  * The component model is set to "spring" to allow for dependency injection.
- * This mapper extends PagingResultMapper to provide pagination support.
+ * This mapper extends PagingMapper to provide pagination support.
  */
 @Mapper(componentModel = "spring", uses = {UserProfileMapper.class})
-public interface UserMapper extends PagingResultMapper {
+public interface UserMapper extends PagingMapper {
     /**
      * Converts a UserCreation DTO to a User entity.
      *
@@ -29,22 +30,30 @@ public interface UserMapper extends PagingResultMapper {
     /**
      * Converts a User entity to a User DTO.
      * This method maps the UserProfile fields to the User DTO response.
-     * If the User entity is a Customer, it will be mapped from customer to UserDtoRes.
+     * If the User entity is a Customer, it will be mapped from customer to UserRes.
      *
      * @param user the User entity
      * @return the User DTO response
      */
-    // for destructuring the UserProfile entity to UserDtoRes
+    // for destructuring the UserProfile entity to UserRes
     @Mapping(source = "user.userProfile.firstName", target = "firstName")
     @Mapping(source = "user.userProfile.lastName", target = "lastName")
-    @Mapping(source = "user.userProfile.phoneNumber", target = "phoneNumber")
-    @Mapping(source = "user.userProfile.address", target = "address")
     @Mapping(source = "user.userProfile.avatar", target = "avatar")
-    @Mapping(source = "user.userProfile.bio", target = "bio")
-    @Mapping(source = "user.userProfile.dob", target = "dob")
-    @SubclassMapping(source = Customer.class, target = UserDtoRes.class)
-    UserDtoRes toDto(User user);
+    @SubclassMapping(source = Customer.class, target = UserRes.class)
+    UserRes toDto(User user);
 
+    /**
+     * Converts a User entity to a UserDetails DTO.
+     * This method maps the UserProfile fields to the UserDetails DTO response.
+     *
+     * @param user the User entity
+     * @return the UserDetails DTO response
+     */
+    @Mapping(source = "user.userProfile.firstName", target = "firstName")
+    @Mapping(source = "user.userProfile.lastName", target = "lastName")
+    @Mapping(source = "user.userProfile.avatar", target = "avatar")
+    @SubclassMapping(source = Customer.class, target = UserDetailsRes.class)
+    UserDetailsRes toUserDetailsDto(User user);
     /**
      * subclass mapping from UserCreation DTO to Customer entity.
      *

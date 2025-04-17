@@ -1,21 +1,21 @@
 package com.example.assignment.service.impl;
 
-import com.example.assignment.dto.response.PagingResult;
+import com.example.assignment.dto.response.PagingRes;
+import com.example.assignment.dto.response.UserDetailsRes;
+import com.example.assignment.dto.response.UserRes;
 import com.example.assignment.entity.Customer;
+import com.example.assignment.exception.ResourceAlreadyExistException;
 import com.example.assignment.repository.CustomerRepository;
 import com.example.assignment.repository.UserRepository;
 import com.example.assignment.service.UserService;
 import com.example.assignment.dto.request.UserCreationReq;
 import com.example.assignment.dto.request.UserInfoUpdatingReq;
-import com.example.assignment.dto.response.UserDtoRes;
 import com.example.assignment.entity.User;
 import com.example.assignment.entity.UserProfile;
 import com.example.assignment.mapper.UserMapper;
 import com.example.assignment.mapper.UserProfileMapper;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import com.example.assignment.service.impl.paging.UserPagingServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -26,26 +26,16 @@ import org.springframework.transaction.annotation.Transactional;
  * This class implements the UserService interface and provides methods for creating, updating, deleting, and retrieving users.
  * It uses UserRepository and CustomerRepository for database operations.
  * It also uses UserMapper and UserProfileMapper for converting between User entity and DTOs.
- * Use for user authentication and authorization purposes.
+ * Use for user authentication and authorization.
  */
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final CustomerRepository customerRepository;
     private final UserMapper userMapper;
     private final UserProfileMapper userProfileMapper;
-
-    public UserServiceImpl(
-        UserRepository userRepository,
-        CustomerRepository customerRepository,
-        UserMapper userMapper,
-        UserProfileMapper userProfileMapper
-    ) {
-        this.userRepository = userRepository;
-        this.customerRepository = customerRepository;
-        this.userMapper = userMapper;
-        this.userProfileMapper = userProfileMapper;
-    }
+    private final UserPagingServiceImpl userPagingService;
 
 
     @Override
@@ -55,10 +45,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserDtoRes createUser(UserCreationReq userCreationReq) {
+    public UserRes createUser(UserCreationReq userCreationReq) {
         // check if the user already exists
         if (userRepository.existsUserByEmail(userCreationReq.getEmail())) {
-            throw new RuntimeException("User already exists");
+            throw new ResourceAlreadyExistException("User already exists");
         }
         UserProfile userProfile = userProfileMapper.toEntity(userCreationReq);
         Customer user = userMapper.toCustomer(userCreationReq, userProfile);
@@ -70,7 +60,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserDtoRes updateUserById(Long id, UserInfoUpdatingReq userInfoUpdatingReq) {
+    public UserRes updateUserById(Long id, UserInfoUpdatingReq userInfoUpdatingReq) {
         User user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         UserProfile existingUserProfile = user.getUserProfile();
         existingUserProfile.setFirstName(userInfoUpdatingReq.getFirstName());
@@ -97,20 +87,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PagingResult<UserDtoRes> getUsers(Integer pageNo, Integer pageSize, String sortBy) {
-        Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-        Page<User> userPages = userRepository.findAll(paging);
-        if (userPages.hasContent()) {
-            return userMapper.toPagingResult(userPages, userMapper::toDto);
-        } else {
+    public PagingRes<UserRes> getUsers(Integer pageNo, Integer pageSize, String sortDir, String sortBy) {
+        try {
+            return userPagingService.getMany(pageNo, pageSize, sortDir, sortBy);
+        } catch (Exception e) {
             throw new UsernameNotFoundException("No users found");
         }
     }
 
     @Override
-    public UserDtoRes getUserById(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
-        return userMapper.toDto(user);
+    public UserDetailsRes getUserById(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return userMapper.toUserDetailsDto(user);
     }
 
 }

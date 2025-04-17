@@ -2,8 +2,9 @@ package com.example.assignment.controller;
 
 import com.example.assignment.dto.request.ProductCreationReq;
 import com.example.assignment.dto.request.ProductUpdatingReq;
-import com.example.assignment.dto.response.PagingResult;
-import com.example.assignment.dto.response.ProductDtoRes;
+import com.example.assignment.dto.response.PagingRes;
+import com.example.assignment.dto.response.ProductDetailRes;
+import com.example.assignment.dto.response.ProductRes;
 import com.example.assignment.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,30 +19,31 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDtoRes> getAllProducts(@PathVariable Long id) {
-        ProductDtoRes products = productService.getProductById(id);
+    public ResponseEntity<ProductDetailRes> getAllProducts(@PathVariable Long id) {
+        ProductDetailRes products = productService.getProductById(id);
         return ResponseEntity.ok(products);
     }
 
     @GetMapping
-    public ResponseEntity<PagingResult<ProductDtoRes>> getPageableProducts(
+    public ResponseEntity<PagingRes<ProductRes>> getPageableProducts(
         @RequestParam(defaultValue = "0") Integer pageNo,
         @RequestParam(defaultValue = "10") Integer pageSize,
-        @RequestParam(defaultValue = "id") String sortBy
+        @RequestParam(defaultValue = "id") String sortBy,
+        @RequestParam(defaultValue = "asc") String sortDir
     ) {
-        PagingResult<ProductDtoRes> products = productService.getProducts(pageNo, pageSize, sortBy);
+        PagingRes<ProductRes> products = productService.getProducts(pageNo, pageSize, sortDir, sortBy);
         return ResponseEntity.ok(products);
     }
 
     @PostMapping
-    public ResponseEntity<ProductDtoRes> createProduct(@RequestBody ProductCreationReq productCreationReq) {
-        ProductDtoRes createdProduct = productService.createProduct(productCreationReq);
+    public ResponseEntity<ProductRes> createProduct(@RequestBody ProductCreationReq productCreationReq) {
+        ProductRes createdProduct = productService.createProduct(productCreationReq);
         return ResponseEntity.status(201).body(createdProduct);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductDtoRes> updateProductById(@PathVariable Long id, @RequestBody ProductUpdatingReq productUpdatingReq) {
-        ProductDtoRes updatedProduct = productService.updateProductById(id, productUpdatingReq);
+    public ResponseEntity<ProductRes> updateProductById(@PathVariable Long id, @RequestBody ProductUpdatingReq productUpdatingReq) {
+        ProductRes updatedProduct = productService.updateProductById(id, productUpdatingReq);
         return ResponseEntity.ok(updatedProduct);
     }
 
@@ -52,30 +54,32 @@ public class ProductController {
     }
 
     @PatchMapping("/{id}/category/{categoryId}")
-    public ResponseEntity<ProductDtoRes> updateProductCategoryById(@PathVariable Long id, @PathVariable Long categoryId) {
-        ProductDtoRes updatedProduct = productService.updateProductCategoryById(id, categoryId);
+    public ResponseEntity<ProductRes> updateProductCategoryById(@PathVariable Long id, @PathVariable Long categoryId) {
+        ProductRes updatedProduct = productService.updateProductCategoryById(id, categoryId);
         return ResponseEntity.ok(updatedProduct);
     }
 
     @GetMapping("/category/{categoryId}")
-    public ResponseEntity<PagingResult<ProductDtoRes>> getProductsByCategoryId(
+    public ResponseEntity<PagingRes<ProductRes>> getProductsByCategoryId(
         @PathVariable Long categoryId,
         @RequestParam(defaultValue = "0") Integer pageNo,
         @RequestParam(defaultValue = "10") Integer pageSize,
-        @RequestParam(defaultValue = "id") String sortBy
+        @RequestParam(defaultValue = "id") String sortBy,
+        @RequestParam(defaultValue = "asc") String sortDir
     ) {
-        PagingResult<ProductDtoRes> products = productService.getProductsByCategoryId(categoryId, pageNo, pageSize, sortBy);
+        PagingRes<ProductRes> products = productService.getProductsByCategoryId(categoryId, pageNo, pageSize, sortDir, sortBy);
         return ResponseEntity.ok(products);
     }
 
     @GetMapping("search")
-    public ResponseEntity<PagingResult<ProductDtoRes>> searchProducts(
+    public ResponseEntity<PagingRes<ProductRes>> searchProducts(
         @RequestParam String name,
         @RequestParam(defaultValue = "0") Integer pageNo,
         @RequestParam(defaultValue = "10") Integer pageSize,
-        @RequestParam(defaultValue = "id") String sortBy
+        @RequestParam(defaultValue = "id") String sortBy,
+        @RequestParam(defaultValue = "asc") String sortDir
     ) {
-        PagingResult<ProductDtoRes> products = productService.getProductsByName(name, pageNo, pageSize, sortBy);
+        PagingRes<ProductRes> products = productService.getProductsByName(name, pageNo, pageSize, sortDir, sortBy);
         return ResponseEntity.ok(products);
     }
 }

@@ -1,6 +1,7 @@
 package com.example.assignment.mapper.helper;
 
 import com.example.assignment.entity.Category;
+import com.example.assignment.exception.ResourceNotFoundException;
 import com.example.assignment.repository.CategoryRepository;
 import org.mapstruct.Named;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,6 @@ public class CategoryMappingHelper {
     @Named("mapCategoryFromId")
     public Category map(Long id) {
         return categoryRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Category not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
     }
 }

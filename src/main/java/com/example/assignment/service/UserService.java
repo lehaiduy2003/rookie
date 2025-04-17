@@ -1,8 +1,9 @@
 package com.example.assignment.service;
 import com.example.assignment.dto.request.UserCreationReq;
 import com.example.assignment.dto.request.UserInfoUpdatingReq;
-import com.example.assignment.dto.response.PagingResult;
-import com.example.assignment.dto.response.UserDtoRes;
+import com.example.assignment.dto.response.PagingRes;
+import com.example.assignment.dto.response.UserDetailsRes;
+import com.example.assignment.dto.response.UserRes;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 
@@ -19,7 +20,7 @@ public interface UserService extends UserDetailsService {
      * @param userCreationReq the request object containing user creation details
      * @return the created user
      */
-    UserDtoRes createUser(UserCreationReq userCreationReq);
+    UserRes createUser(UserCreationReq userCreationReq);
 
     /**
      * Updates an existing user.
@@ -28,7 +29,7 @@ public interface UserService extends UserDetailsService {
      * @param userInfoUpdatingReq the request object containing user update details
      * @return the updated user
      */
-    UserDtoRes updateUserById(Long id, UserInfoUpdatingReq userInfoUpdatingReq);
+    UserRes updateUserById(Long id, UserInfoUpdatingReq userInfoUpdatingReq);
 
     /**
      * Retrieves a user by id.
@@ -36,7 +37,7 @@ public interface UserService extends UserDetailsService {
      * @param id the id of the user to retrieve
      * @return the retrieved user
      */
-    UserDtoRes getUserById(Long id);
+    UserDetailsRes getUserById(Long id);
 
     /**
      * Deletes a user by id.
@@ -50,8 +51,9 @@ public interface UserService extends UserDetailsService {
      *
      * @param pageNo the page number to retrieve
      * @param pageSize the number of users per page
+     * @param sortDir the direction to sort (ascending or descending)
      * @param sortBy the field to sort by
      * @return the retrieved paging result of users
      */
-    PagingResult<UserDtoRes> getUsers(Integer pageNo, Integer pageSize, String sortBy);
+    PagingRes<UserRes> getUsers(Integer pageNo, Integer pageSize, String sortDir, String sortBy);
 }

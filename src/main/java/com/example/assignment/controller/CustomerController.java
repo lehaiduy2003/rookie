@@ -1,7 +1,7 @@
 package com.example.assignment.controller;
 
-import com.example.assignment.dto.response.PagingResult;
-import com.example.assignment.dto.response.UserDtoRes;
+import com.example.assignment.dto.response.PagingRes;
+import com.example.assignment.dto.response.UserRes;
 import com.example.assignment.service.CustomerService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,12 +16,14 @@ public class CustomerController {
     }
 
     @GetMapping
-    public ResponseEntity<PagingResult<UserDtoRes>> getPageableCustomers(
+    public ResponseEntity<PagingRes<UserRes>> getPageableCustomers(
         @RequestParam(defaultValue = "0") Integer pageNo,
         @RequestParam(defaultValue = "10") Integer pageSize,
-        @RequestParam(defaultValue = "id") String sortBy) {
+        @RequestParam(defaultValue = "asc") String sortDir,
+        @RequestParam(defaultValue = "id") String sortBy
+        ) {
         try {
-            PagingResult<UserDtoRes> customers = customerService.getPageableCustomers(pageNo, pageSize, sortBy);
+            PagingRes<UserRes> customers = customerService.getCustomers(pageNo, pageSize, sortDir, sortBy);
             return ResponseEntity.ok(customers);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
@@ -29,23 +31,20 @@ public class CustomerController {
     }
 
     @GetMapping("/tier")
-    public ResponseEntity<PagingResult<UserDtoRes>> getPageableCustomersByTier(
+    public ResponseEntity<PagingRes<UserRes>> getPageableCustomersByTier(
         @RequestParam String memberTier,
         @RequestParam(defaultValue = "0") Integer pageNo,
         @RequestParam(defaultValue = "10") Integer pageSize,
+        @RequestParam(defaultValue = "asc") String sortDir,
         @RequestParam(defaultValue = "id") String sortBy) {
-        try {
-            PagingResult<UserDtoRes> customers = customerService.getPageableCustomersByTier(memberTier, pageNo, pageSize, sortBy);
-            return ResponseEntity.ok(customers);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
+        PagingRes<UserRes> customers = customerService.getCustomersByTier(memberTier, pageNo, pageSize, sortDir, sortBy);
+        return ResponseEntity.ok(customers);
     }
 
-    @PutMapping("/{customerId}/tier")
+    @PatchMapping("/{customerId}/tier/{memberTier}")
     public ResponseEntity<Void> updateMemberTier(
         @PathVariable Long customerId,
-        @RequestParam String memberTier) {
+        @PathVariable String memberTier) {
         try {
             customerService.updateMemberTier(customerId, memberTier);
             return ResponseEntity.noContent().build();
