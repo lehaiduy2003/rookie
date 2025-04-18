@@ -31,8 +31,8 @@ public class CustomerController {
         }
     }
 
-    @GetMapping("/tier")
     @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/tier")
     public ResponseEntity<PagingRes<UserRes>> getPageableCustomersByTier(
         @RequestParam String memberTier,
         @RequestParam(defaultValue = "0") Integer pageNo,
@@ -43,8 +43,8 @@ public class CustomerController {
         return ResponseEntity.ok(customers);
     }
 
-    @PatchMapping("/{customerId}/tier/{memberTier}")
     @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/{customerId}/tier/{memberTier}")
     public ResponseEntity<Void> updateMemberTier(
         @PathVariable Long customerId,
         @PathVariable String memberTier) {
