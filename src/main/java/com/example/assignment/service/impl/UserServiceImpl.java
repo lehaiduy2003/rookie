@@ -1,5 +1,6 @@
 package com.example.assignment.service.impl;
 
+import com.example.assignment.annotation.Logging;
 import com.example.assignment.dto.response.PagingRes;
 import com.example.assignment.dto.response.UserDetailsRes;
 import com.example.assignment.dto.response.UserRes;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @RequiredArgsConstructor
+@Logging
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final CustomerRepository customerRepository;

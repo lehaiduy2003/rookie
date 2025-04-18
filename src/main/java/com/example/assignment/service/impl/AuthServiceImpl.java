@@ -1,5 +1,6 @@
 package com.example.assignment.service.impl;
 
+import com.example.assignment.annotation.Logging;
 import com.example.assignment.dto.request.LoginReq;
 import com.example.assignment.dto.request.RegisterReq;
 import com.example.assignment.dto.request.UserCreationReq;
@@ -28,6 +29,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
+@Logging
 public class AuthServiceImpl implements AuthService {
 
     private final UserService userService;
