@@ -1,11 +1,12 @@
 package com.example.assignment.provider;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import com.example.assignment.entity.User;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -14,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+@Slf4j
 @Component
 public class JwtProvider {
 
@@ -48,31 +50,51 @@ public class JwtProvider {
                 .getPayload();
     }
 
-    private Boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+    public String generateAccessToken(User user) {
+        return generateToken(new HashMap<>(), user, accessTokenExpiration);
     }
 
-    public String generateAccessToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails, accessTokenExpiration);
+    public String generateRefreshToken(User user) {
+        return generateToken(new HashMap<>(), user, refreshTokenExpiration);
     }
 
-    public String generateRefreshToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails, refreshTokenExpiration);
-    }
-
-    private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails, long expiration) {
+    private String generateToken(Map<String, Object> extraClaims, User user, long expiration) {
         return Jwts.builder()
                 .claims(extraClaims)
-                .subject(userDetails.getUsername())
+                .subject(user.getUsername())
+                .claim("id", user.getId())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey())
                 .compact();
     }
 
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    public Boolean validateToken(String token) {
+        try {
+            Jwts.parser()
+                .verifyWith(getSigningKey()) // Verify the token with the signing key
+                .build()
+                .parseSignedClaims(token); // Parse the token to check its validity
+            return true; // return true if token is valid
+        } catch (ExpiredJwtException e) {
+            log.info("Expired JWT token");
+        } catch (MalformedJwtException e) {
+            log.info("Invalid JWT token");
+        } catch (IllegalArgumentException e) {
+            log.info("JWT claims string is empty");
+        } catch (UnsupportedJwtException e) {
+            log.info("JWT token is unsupported");
+        } catch (SignatureException e) {
+            log.info("Invalid JWT signature");
+        } catch (Exception e) {
+            log.info("JWT token validation failed: " + e.getMessage());
+        }
+        return false; // return false if any exception occurs
+    }
+
+    public Boolean iscorrectUser(String token, User user) {
+        String username = extractUsername(token);
+        return (username.equals(user.getUsername()));
     }
 
     private SecretKey getSigningKey() {
