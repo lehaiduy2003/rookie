@@ -6,21 +6,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 /**
- * Configuration class for password encoding.
- * This class provides a bean for encoding passwords using BCrypt.
- * Use the static method passwordEncoder() to get an instance of PasswordEncoder.
+ * Security configuration class to set up password encoding.
+ * This class configures the password encoder for the application.
+ * It provides a bean for the PasswordEncoder to be used for encoding and matching passwords.
+ * It uses BCryptPasswordEncoder for secure password hashing.
  */
 @Component
 public class PasswordEncoderConfig {
-    private PasswordEncoderConfig() {
-        // Private constructor to prevent instantiation
-    }
     /**
-     * Password encoder bean for encoding passwords.
-     * @return a PasswordEncoder instance.
+     * Bean to configure the password encoder.
+     * @return a PasswordEncoder instance
      */
-     @Bean
-     public static PasswordEncoder passwordEncoder() {
-         return new BCryptPasswordEncoder();
-     }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 }
