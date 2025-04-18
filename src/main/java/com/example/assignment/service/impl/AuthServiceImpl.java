@@ -16,6 +16,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,6 +36,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordUtil passwordUtil;
 
     @Override
+    @Transactional
     public AuthRes register(RegisterReq registerReq, HttpServletResponse response) {
         // Create user creation request from register request
         UserCreationReq userCreationReq = UserCreationReq.builder()
