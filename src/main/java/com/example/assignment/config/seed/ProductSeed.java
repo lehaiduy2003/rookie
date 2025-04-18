@@ -35,6 +35,7 @@ public class ProductSeed implements CommandLineRunner {
         product1.setPrice(19.99);
         product1.setQuantity(10);
         product1.setIsActive(true);
+        product1.setFeatured(true);
         product1.setCategory(category);
 
         Product product2 = new Product();
@@ -43,6 +44,7 @@ public class ProductSeed implements CommandLineRunner {
         product2.setPrice(29.99);
         product2.setQuantity(10);
         product2.setIsActive(true);
+        product2.setFeatured(false);
         product2.setCategory(category);
 
         Product product3 = new Product();
@@ -51,6 +53,7 @@ public class ProductSeed implements CommandLineRunner {
         product3.setPrice(39.99);
         product3.setQuantity(10);
         product3.setIsActive(true);
+        product3.setFeatured(false);
         product3.setCategory(category);
 
         // Save products to the database

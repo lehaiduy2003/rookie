@@ -61,4 +61,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
   WHERE id = :productId
 """, nativeQuery = true)
     void updateProductRating(@Param("productId") Long productId, @Param("score") double score);
+
+    /**
+     * Finds a page of products that are featured.
+     * @param featured the featured status to filter products by
+     * @param pageable the pagination information
+     * @return a page of products that are featured
+     */
+    Page<Product> findByFeatured(boolean featured, Pageable pageable);
 }
