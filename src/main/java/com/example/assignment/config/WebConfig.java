@@ -24,7 +24,7 @@ import static com.example.assignment.constant.SecurityURL.PUBLIC_URLS;
 public class WebConfig implements WebMvcConfigurer {
 
     private static final String ENVIRONMENT = System.getProperty("spring.profiles.active");
-    private static final String[] ALLOWED_ORIGINS = {"http://localhost:3000"};
+    private static final String[] ALLOWED_ORIGINS = {"http://localhost:3000", "http://localhost:5173"};
 
     /**
      * Configures content negotiation for the application.

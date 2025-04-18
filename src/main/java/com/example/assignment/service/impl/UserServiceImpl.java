@@ -22,6 +22,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+
 /**
  * Service implementation for managing user (CRUD) operations.
  * This class implements the UserService interface and provides methods for creating, updating, deleting, and retrieving users.
@@ -42,12 +44,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found with email: " + email);
+        }
+        return user;
     }
 
     @Override
     @Transactional
-    public UserRes createUser(UserCreationReq userCreationReq) {
+    public UserDetailsRes createUser(UserCreationReq userCreationReq) {
         // check if the user already exists
         if (userRepository.existsUserByEmail(userCreationReq.getEmail())) {
             throw new ResourceAlreadyExistException("User already exists");
@@ -57,12 +63,12 @@ public class UserServiceImpl implements UserService {
         user.setUserProfile(userProfile);
         userProfile.setUser(user);
         customerRepository.save(user);
-        return userMapper.toDto(user);
+        return userMapper.toUserDetailsDto(user);
     }
 
     @Override
     @Transactional
-    public UserRes updateUserById(Long id, UserInfoUpdatingReq userInfoUpdatingReq) {
+    public UserDetailsRes updateUserById(Long id, UserInfoUpdatingReq userInfoUpdatingReq) {
         User user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         UserProfile existingUserProfile = user.getUserProfile();
         existingUserProfile.setFirstName(userInfoUpdatingReq.getFirstName());
@@ -72,7 +78,7 @@ public class UserServiceImpl implements UserService {
         existingUserProfile.setAvatar(userInfoUpdatingReq.getAvatar());
         user.setUserProfile(existingUserProfile);
         User updatedUser = userRepository.save(user);
-        return userMapper.toDto(updatedUser);
+        return userMapper.toUserDetailsDto(updatedUser);
     }
 
     @Override
@@ -93,7 +99,15 @@ public class UserServiceImpl implements UserService {
         try {
             return userPagingService.getMany(pageNo, pageSize, sortDir, sortBy);
         } catch (Exception e) {
-            throw new UsernameNotFoundException("No users found");
+            // More appropriate to return an empty result than throw an exception
+            return PagingRes.<UserRes>builder()
+                    .content(new ArrayList<>())
+                    .totalElements(0)
+                    .totalPages(0)
+                    .size(pageSize)
+                    .page(pageNo)
+                    .empty(true)
+                    .build();
         }
     }
 
