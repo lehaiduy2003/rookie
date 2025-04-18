@@ -22,6 +22,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+
 /**
  * Service implementation for managing user (CRUD) operations.
  * This class implements the UserService interface and provides methods for creating, updating, deleting, and retrieving users.
@@ -42,7 +44,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found with email: " + email);
+        }
+        return user;
     }
 
     @Override
@@ -93,7 +99,15 @@ public class UserServiceImpl implements UserService {
         try {
             return userPagingService.getMany(pageNo, pageSize, sortDir, sortBy);
         } catch (Exception e) {
-            throw new UsernameNotFoundException("No users found");
+            // More appropriate to return an empty result than throw an exception
+            return PagingRes.<UserRes>builder()
+                    .content(new ArrayList<>())
+                    .totalElements(0)
+                    .totalPages(0)
+                    .size(pageSize)
+                    .page(pageNo)
+                    .empty(true)
+                    .build();
         }
     }
 
