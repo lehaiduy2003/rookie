@@ -33,7 +33,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
     public ResponseEntity<UserRes> updateUser(@PathVariable Long id, @Valid @RequestBody UserInfoUpdatingReq userInfoUpdatingReq) {
         try {
             UserRes updatedUser = userService.updateUserById(id, userInfoUpdatingReq);
@@ -44,8 +44,8 @@ public class UserController {
 
     }
 
-    @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         try {
             userService.deleteUserById(id);
@@ -55,8 +55,8 @@ public class UserController {
         }
     }
 
-    @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping
     public ResponseEntity<PagingRes<UserRes>> getPageableUsers(
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,

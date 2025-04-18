@@ -33,37 +33,33 @@ public class ProductController {
         @RequestParam(defaultValue = "id") String sortBy,
         @RequestParam(defaultValue = "asc") String sortDir
     ) {
-        if (Boolean.TRUE.equals(featured)) {
-            PagingRes<ProductRes> featuredProducts = getFeaturedProducts(pageNo, pageSize, sortBy, sortDir);
-            return ResponseEntity.ok(featuredProducts);
-        } else {
-            PagingRes<ProductRes> products = productService.getProducts(pageNo, pageSize, sortDir, sortBy);
-            return ResponseEntity.ok(products);
-        }
+        PagingRes<ProductRes> featuredProducts = getFeaturedProducts(pageNo, pageSize, sortBy, sortDir);
+        return ResponseEntity.ok(featuredProducts);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    @PreAuthorize("hasRole({'ADMIN', 'CUSTOMER'})")
     public ResponseEntity<ProductRes> createProduct(@RequestBody ProductCreationReq productCreationReq) {
         ProductRes createdProduct = productService.createProduct(productCreationReq);
         return ResponseEntity.status(201).body(createdProduct);
     }
 
+    @PreAuthorize("hasRole({'ADMIN'})")
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole({'ADMIN', 'CUSTOMER'})")
     public ResponseEntity<ProductRes> updateProductById(@PathVariable Long id, @RequestBody ProductUpdatingReq productUpdatingReq) {
         ProductRes updatedProduct = productService.updateProductById(id, productUpdatingReq);
         return ResponseEntity.ok(updatedProduct);
     }
 
+    @PreAuthorize("hasRole({'ADMIN'})")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProductById(@PathVariable Long id) {
         productService.deleteProductById(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}/category/{categoryId}")
-    @PreAuthorize("hasRole({'ADMIN', 'CUSTOMER'})")
     public ResponseEntity<ProductRes> updateProductCategoryById(@PathVariable Long id, @PathVariable Long categoryId) {
         ProductRes updatedProduct = productService.updateProductCategoryById(id, categoryId);
         return ResponseEntity.ok(updatedProduct);
@@ -93,6 +89,7 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updateFeaturedProduct(@PathVariable Long id, @RequestParam(defaultValue = "false") Boolean featured) {
         productService.updateToFeaturedProduct(id, featured);

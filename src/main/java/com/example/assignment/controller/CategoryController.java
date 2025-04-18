@@ -20,8 +20,8 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping
     public ResponseEntity<CategoryRes> createCategory(@Valid @RequestBody CategoryCreationReq categoryCreationReq) {
         try {
             CategoryRes createdCategory = categoryService.createCategory(categoryCreationReq);
@@ -31,8 +31,8 @@ public class CategoryController {
         }
     }
 
-    @PutMapping("/{categoryId}")
     @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{categoryId}")
     public ResponseEntity<CategoryRes> updateCategory(@PathVariable Long categoryId, @Valid @RequestBody CategoryCreationReq categoryCreationReq) {
         try {
             CategoryRes updatedCategory = categoryService.updateCategoryById(categoryId, categoryCreationReq);
@@ -42,8 +42,8 @@ public class CategoryController {
         }
     }
 
-    @DeleteMapping("/{categoryId}")
     @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{categoryId}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId) {
         try {
             categoryService.deleteCategoryById(categoryId);
@@ -53,8 +53,8 @@ public class CategoryController {
         }
     }
 
-    @DeleteMapping("/{categoryId}/force")
     @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{categoryId}/force")
     public ResponseEntity<Void> forceDeleteCategory(@PathVariable Long categoryId) {
         try {
             categoryService.forceDeleteCategoryById(categoryId);
