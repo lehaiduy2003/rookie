@@ -2,6 +2,7 @@ package com.example.assignment;
 
 import com.example.assignment.entity.Category;
 import com.example.assignment.entity.Product;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
 
 /**
  * Simple test class to verify product validation logic without loading the full application context.
@@ -18,21 +18,29 @@ import static org.mockito.Mockito.when;
 class SimpleProductValidationTest {
 
     @Mock
-    private Product product;
-
-    @Mock
     private Category category;
+
+
+    @BeforeEach
+    void setUp() {
+        category = new Category();
+        category.setId(1L);
+        category.setName("Test Category");
+        category.setDescription("Test Description");
+        category.setParent(null);
+    }
 
     @Test
     @DisplayName("Test validateProduct - negative quantity")
     void testValidateProduct_NegativeQuantity() {
         // Create a product with negative quantity
-        when(product.getQuantity()).thenReturn(-1);
-        when(product.getAvgRating()).thenReturn(0.0);
-        when(product.getRatingCount()).thenReturn(0L);
-        when(product.getPrice()).thenReturn(100.0);
-        when(product.getName()).thenReturn("Test Product");
-        when(product.getCategory()).thenReturn(category);
+        Product product = new Product();
+        product.setQuantity(-10); // Negative quantity
+        product.setAvgRating(0.0);
+        product.setRatingCount(0L);
+        product.setPrice(300.0);
+        product.setName("Test Product");
+        product.setCategory(category);
 
         // Create a method to test the validation logic
         Runnable validation = () -> {
@@ -49,12 +57,14 @@ class SimpleProductValidationTest {
     @DisplayName("Test validateProduct - negative price")
     void testValidateProduct_NegativePrice() {
         // Create a product with a negative price
-        when(product.getQuantity()).thenReturn(10);
-        when(product.getAvgRating()).thenReturn(0.0);
-        when(product.getRatingCount()).thenReturn(0L);
-        when(product.getPrice()).thenReturn(-10.0);
-        when(product.getName()).thenReturn("Test Product");
-        when(product.getCategory()).thenReturn(category);
+        Product product = new Product();
+        product.setQuantity(10);
+        product.setAvgRating(0.0);
+        product.setRatingCount(0L);
+        product.setPrice(-100.0); // Negative price
+        product.setName("Test Product");
+        product.setCategory(category);
+
 
         // Create a method to test the validation logic
         Runnable validation = () -> {
@@ -71,12 +81,13 @@ class SimpleProductValidationTest {
     @DisplayName("Test validateProduct - avgRating out of range")
     void testValidateProduct_AvgRatingOutOfRange() {
         // Create a product with avgRating > 5
-        when(product.getQuantity()).thenReturn(10);
-        when(product.getAvgRating()).thenReturn(6.0);
-        when(product.getRatingCount()).thenReturn(0L);
-        when(product.getPrice()).thenReturn(100.0);
-        when(product.getName()).thenReturn("Test Product");
-        when(product.getCategory()).thenReturn(category);
+        Product product = new Product();
+        product.setQuantity(10);
+        product.setAvgRating(6); // Out of range
+        product.setRatingCount(0L);
+        product.setPrice(100.0);
+        product.setName("Test Product");
+        product.setCategory(category);
 
         // Create a method to test the validation logic
         Runnable validation = () -> {
@@ -93,12 +104,13 @@ class SimpleProductValidationTest {
     @DisplayName("Test validateProduct - negative avgRating")
     void testValidateProduct_NegativeAvgRating() {
         // Create a product with negative avgRating
-        when(product.getQuantity()).thenReturn(10);
-        when(product.getAvgRating()).thenReturn(-1.0);
-        when(product.getRatingCount()).thenReturn(0L);
-        when(product.getPrice()).thenReturn(100.0);
-        when(product.getName()).thenReturn("Test Product");
-        when(product.getCategory()).thenReturn(category);
+        Product product = new Product();
+        product.setQuantity(10);
+        product.setAvgRating(-5.0); // Negative avgRating
+        product.setRatingCount(0L);
+        product.setPrice(100.0);
+        product.setName("Test Product");
+        product.setCategory(category);
 
         // Create a method to test the validation logic
         Runnable validation = () -> {
@@ -115,12 +127,13 @@ class SimpleProductValidationTest {
     @DisplayName("Test validateProduct - negative ratingCount")
     void testValidateProduct_NegativeRatingCount() {
         // Create a product with a negative ratingCount
-        when(product.getQuantity()).thenReturn(10);
-        when(product.getAvgRating()).thenReturn(0.0);
-        when(product.getRatingCount()).thenReturn(-1L);
-        when(product.getPrice()).thenReturn(100.0);
-        when(product.getName()).thenReturn("Test Product");
-        when(product.getCategory()).thenReturn(category);
+        Product product = new Product();
+        product.setQuantity(10);
+        product.setAvgRating(0.0);
+        product.setRatingCount(-2L); // Negative ratingCount
+        product.setPrice(100.0);
+        product.setName("Test Product");
+        product.setCategory(category);
 
         // Create a method to test the validation logic
         Runnable validation = () -> {
@@ -137,12 +150,13 @@ class SimpleProductValidationTest {
     @DisplayName("Test validateProduct - null name")
     void testValidateProduct_NullName() {
         // Create a product with a null name
-        when(product.getQuantity()).thenReturn(10);
-        when(product.getAvgRating()).thenReturn(0.0);
-        when(product.getRatingCount()).thenReturn(0L);
-        when(product.getPrice()).thenReturn(100.0);
-        when(product.getName()).thenReturn(null);
-        when(product.getCategory()).thenReturn(category);
+        Product product = new Product();
+        product.setQuantity(10);
+        product.setAvgRating(0.0);
+        product.setRatingCount(0L);
+        product.setPrice(100.0);
+        product.setName(null); // Null name
+        product.setCategory(category);
 
         // Create a method to test the validation logic
         Runnable validation = () -> {
@@ -159,12 +173,13 @@ class SimpleProductValidationTest {
     @DisplayName("Test validateProduct - null category")
     void testValidateProduct_NullCategory() {
         // Create a product with a null category
-        when(product.getQuantity()).thenReturn(10);
-        when(product.getAvgRating()).thenReturn(0.0);
-        when(product.getRatingCount()).thenReturn(0L);
-        when(product.getPrice()).thenReturn(100.0);
-        when(product.getName()).thenReturn("Test Product");
-        when(product.getCategory()).thenReturn(null);
+        Product product = new Product();
+        product.setQuantity(10);
+        product.setAvgRating(0.0);
+        product.setRatingCount(0L);
+        product.setPrice(100.0);
+        product.setName("Test Product");
+        product.setCategory(null); // Null category
 
         // Create a method to test the validation logic
         Runnable validation = () -> {
