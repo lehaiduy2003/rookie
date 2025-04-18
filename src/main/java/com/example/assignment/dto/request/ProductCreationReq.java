@@ -9,14 +9,17 @@ import lombok.Data;
 @Data
 @Builder
 public class ProductCreationReq {
+    @NotNull(message = "Product name cannot be null")
+    @NotBlank(message = "Product name cannot be blank")
     private String name;
     private String description;
-    @NotNull
-    @NotBlank(message = "Category ID cannot be null or blank")
+    @NotNull(message = "Category ID cannot be null")
     private Long categoryId;
+    @NotNull(message = "Price cannot be null")
     @Min(value = 0, message = "Price must be greater than or equal to 0")
     private Double price;
-    @Min(value = 1, message = "Quantity must be greater than or equal to 1")
+    @NotNull(message = "Quantity cannot be null")
+    @Min(value = 0, message = "Quantity must be greater than or equal to 0")
     private Integer quantity;
     private String imageUrl;
     private Boolean isActive;

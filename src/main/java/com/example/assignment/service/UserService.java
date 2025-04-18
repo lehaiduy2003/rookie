@@ -20,7 +20,7 @@ public interface UserService extends UserDetailsService {
      * @param userCreationReq the request object containing user creation details
      * @return the created user
      */
-    UserRes createUser(UserCreationReq userCreationReq);
+    UserDetailsRes createUser(UserCreationReq userCreationReq);
 
     /**
      * Updates an existing user.
@@ -29,7 +29,7 @@ public interface UserService extends UserDetailsService {
      * @param userInfoUpdatingReq the request object containing user update details
      * @return the updated user
      */
-    UserRes updateUserById(Long id, UserInfoUpdatingReq userInfoUpdatingReq);
+    UserDetailsRes updateUserById(Long id, UserInfoUpdatingReq userInfoUpdatingReq);
 
     /**
      * Retrieves a user by id.

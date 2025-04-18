@@ -23,7 +23,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -135,19 +134,19 @@ public class AuthServiceImpl implements AuthService {
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid refresh token");
             }
             // Load user details
-            UserDetails userDetails = userService.loadUserByUsername(username);
+            User user = (User) userService.loadUserByUsername(username);
 
             // Validate refresh token
-            if (!Boolean.TRUE.equals(jwtProvider.validateToken(refreshToken, userDetails))) {
+            if (!Boolean.TRUE.equals(jwtProvider.validateToken(refreshToken))) {
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid refresh token");
             }
 
             // Generate a new access token
-            String accessToken = jwtProvider.generateAccessToken(userDetails);
+            String accessToken = jwtProvider.generateAccessToken(user);
 
             // Set authentication in a security context
             Authentication authentication = new UsernamePasswordAuthenticationToken(
-                userDetails, null, userDetails.getAuthorities());
+                user, null, user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             // Return only the access token

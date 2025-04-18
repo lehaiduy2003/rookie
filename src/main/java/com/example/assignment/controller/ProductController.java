@@ -6,6 +6,7 @@ import com.example.assignment.dto.response.PagingRes;
 import com.example.assignment.dto.response.ProductDetailRes;
 import com.example.assignment.dto.response.ProductRes;
 import com.example.assignment.service.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -33,25 +34,30 @@ public class ProductController {
         @RequestParam(defaultValue = "id") String sortBy,
         @RequestParam(defaultValue = "asc") String sortDir
     ) {
-        PagingRes<ProductRes> featuredProducts = getFeaturedProducts(pageNo, pageSize, sortBy, sortDir);
-        return ResponseEntity.ok(featuredProducts);
+        if(Boolean.TRUE.equals(featured)) {
+            PagingRes<ProductRes> featuredProducts = getFeaturedProducts(pageNo, pageSize, sortBy, sortDir);
+            return ResponseEntity.ok(featuredProducts);
+        }
+        PagingRes<ProductRes> products = productService.getProducts(pageNo, pageSize, sortDir, sortBy);
+        return ResponseEntity.ok(products);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<ProductRes> createProduct(@RequestBody ProductCreationReq productCreationReq) {
+    public ResponseEntity<ProductRes> createProduct(@Valid @RequestBody ProductCreationReq productCreationReq) {
         ProductRes createdProduct = productService.createProduct(productCreationReq);
         return ResponseEntity.status(201).body(createdProduct);
     }
 
-    @PreAuthorize("hasRole({'ADMIN'})")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
-    public ResponseEntity<ProductRes> updateProductById(@PathVariable Long id, @RequestBody ProductUpdatingReq productUpdatingReq) {
+    public ResponseEntity<ProductRes> updateProductById(@PathVariable Long id, @Valid @RequestBody ProductUpdatingReq productUpdatingReq) {
+        // Permission check is handled in the service layer
         ProductRes updatedProduct = productService.updateProductById(id, productUpdatingReq);
         return ResponseEntity.ok(updatedProduct);
     }
 
-    @PreAuthorize("hasRole({'ADMIN'})")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProductById(@PathVariable Long id) {
         productService.deleteProductById(id);

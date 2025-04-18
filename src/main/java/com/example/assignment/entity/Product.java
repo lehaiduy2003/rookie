@@ -34,7 +34,7 @@ public class Product extends BaseEntityAudit {
     private Category category;
     // Add any additional fields or relationships as needed
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
     @ToString.Exclude
     private Set<Rating> ratings;
 

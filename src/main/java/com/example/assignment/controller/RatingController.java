@@ -9,6 +9,7 @@ import com.example.assignment.service.RatingService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -83,9 +84,13 @@ public class RatingController {
         }
     }
 
-    @PreAuthorize("hasRole('CUSTOMER')")
+    @PreAuthorize("hasRole('CUSTOMER') and principal.id == #id")
     @PatchMapping("/{id}")
-    public ResponseEntity<RatingRes> updateRating(@PathVariable Long id, @Valid @RequestBody RatingUpdatingReq ratingUpdatingReq) {
+    public ResponseEntity<RatingRes> updateRating(
+        @PathVariable Long id,
+        @Valid @RequestBody RatingUpdatingReq ratingUpdatingReq,
+        @AuthenticationPrincipal @SuppressWarnings("unused") Object principal // to get the authenticated user for authorization on @PreAuthorize
+        ) {
         try {
             RatingRes updatedRating = ratingService.updateRating(id, ratingUpdatingReq);
             return ResponseEntity.ok(updatedRating);
@@ -98,9 +103,12 @@ public class RatingController {
         }
     }
 
-    @PreAuthorize("hasRole('CUSTOMER')")
+    @PreAuthorize("hasRole('CUSTOMER') and principal.id == #id")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRating(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteRating(
+        @PathVariable Long id,
+        @AuthenticationPrincipal @SuppressWarnings("unused") Object principal // to get the authenticated user for authorization on @PreAuthorize
+    ) {
         try {
             ratingService.deleteRating(id);
             return ResponseEntity.noContent().build();
