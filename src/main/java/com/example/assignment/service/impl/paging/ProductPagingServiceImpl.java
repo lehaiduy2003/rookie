@@ -1,5 +1,6 @@
 package com.example.assignment.service.impl.paging;
 
+import com.example.assignment.annotation.Logging;
 import com.example.assignment.dto.response.PagingRes;
 import com.example.assignment.dto.response.ProductRes;
 import com.example.assignment.entity.Product;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.function.Function;
 
 @Service
+@Logging
 public class ProductPagingServiceImpl extends PagingServiceImpl<ProductRes, Product, Long> {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
