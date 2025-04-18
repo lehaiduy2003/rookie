@@ -40,6 +40,10 @@ public class RatingServiceImpl implements RatingService {
             throw new IllegalArgumentException("Product ID and Customer ID cannot be null");
         }
         double score = ratingCreationReq.getScore();
+        // Validate score range
+        if (score < 1.0 || score > 5.0) {
+            throw new IllegalArgumentException("Score must be between 1 and 5");
+        }
         // Fetch customer and product to ensure they exist
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + productId));
