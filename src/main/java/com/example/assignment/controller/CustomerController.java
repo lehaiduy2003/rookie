@@ -4,6 +4,7 @@ import com.example.assignment.dto.response.PagingRes;
 import com.example.assignment.dto.response.UserRes;
 import com.example.assignment.service.CustomerService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -31,6 +32,7 @@ public class CustomerController {
     }
 
     @GetMapping("/tier")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PagingRes<UserRes>> getPageableCustomersByTier(
         @RequestParam String memberTier,
         @RequestParam(defaultValue = "0") Integer pageNo,
@@ -42,6 +44,7 @@ public class CustomerController {
     }
 
     @PatchMapping("/{customerId}/tier/{memberTier}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> updateMemberTier(
         @PathVariable Long customerId,
         @PathVariable String memberTier) {

@@ -7,6 +7,7 @@ import com.example.assignment.dto.response.ProductDetailRes;
 import com.example.assignment.dto.response.ProductRes;
 import com.example.assignment.service.ProductService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,13 +20,13 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDetailRes> getAllProducts(@PathVariable Long id) {
+    public ResponseEntity<ProductDetailRes> getProduct(@PathVariable Long id) {
         ProductDetailRes products = productService.getProductById(id);
         return ResponseEntity.ok(products);
     }
 
     @GetMapping
-    public ResponseEntity<PagingRes<ProductRes>> getPageableProducts(
+    public ResponseEntity<PagingRes<ProductRes>> getProducts(
         @RequestParam(defaultValue = "0") Integer pageNo,
         @RequestParam(defaultValue = "10") Integer pageSize,
         @RequestParam(defaultValue = "id") String sortBy,
@@ -36,12 +37,14 @@ public class ProductController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole({'ADMIN', 'CUSTOMER'})")
     public ResponseEntity<ProductRes> createProduct(@RequestBody ProductCreationReq productCreationReq) {
         ProductRes createdProduct = productService.createProduct(productCreationReq);
         return ResponseEntity.status(201).body(createdProduct);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole({'ADMIN', 'CUSTOMER'})")
     public ResponseEntity<ProductRes> updateProductById(@PathVariable Long id, @RequestBody ProductUpdatingReq productUpdatingReq) {
         ProductRes updatedProduct = productService.updateProductById(id, productUpdatingReq);
         return ResponseEntity.ok(updatedProduct);
@@ -54,6 +57,7 @@ public class ProductController {
     }
 
     @PatchMapping("/{id}/category/{categoryId}")
+    @PreAuthorize("hasRole({'ADMIN', 'CUSTOMER'})")
     public ResponseEntity<ProductRes> updateProductCategoryById(@PathVariable Long id, @PathVariable Long categoryId) {
         ProductRes updatedProduct = productService.updateProductCategoryById(id, categoryId);
         return ResponseEntity.ok(updatedProduct);
