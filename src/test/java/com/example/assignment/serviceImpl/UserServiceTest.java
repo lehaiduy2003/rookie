@@ -1,4 +1,4 @@
-package com.example.assignment;
+package com.example.assignment.serviceImpl;
 
 import com.example.assignment.dto.request.UserCreationReq;
 import com.example.assignment.dto.request.UserInfoUpdatingReq;
@@ -170,11 +170,11 @@ class UserServiceTest {
         when(userMapper.toDto(any(User.class))).thenReturn(userRes);
 
         // Test
-        UserRes result = userService.createUser(userCreationReq);
+        UserDetailsRes result = userService.createUser(userCreationReq);
 
         // Verify
-        assertNotNull(result);
-        assertEquals(userRes, result);
+        assertNotNull(result, "The result should not be null");
+        assertEquals(userDetailsRes, result, "The result should match the expected DTO");
         verify(userRepository).existsUserByEmail("test@example.com");
         verify(userProfileMapper).toEntity(userCreationReq);
         verify(userMapper).toCustomer(userCreationReq, userProfile);
@@ -205,11 +205,11 @@ class UserServiceTest {
         when(userMapper.toDto(any(User.class))).thenReturn(userRes);
 
         // Test
-        UserRes result = userService.updateUserById(1L, userInfoUpdatingReq);
+        UserDetailsRes result = userService.updateUserById(1L, userInfoUpdatingReq);
 
         // Verify
         assertNotNull(result);
-        assertEquals(userRes, result);
+        assertEquals(userDetailsRes, result);
         verify(userRepository).findById(1L);
         verify(userRepository).save(user);
         verify(userMapper).toDto(user);
