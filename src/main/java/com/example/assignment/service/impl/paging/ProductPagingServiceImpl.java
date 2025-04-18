@@ -44,6 +44,13 @@ public class ProductPagingServiceImpl extends PagingServiceImpl<ProductRes, Prod
         return productRepository.findByNameContainingIgnoreCase(criteria, pageable);
     }
 
+    public PagingRes<ProductRes> getFeaturedProducts(boolean featured, Integer pageNo, Integer pageSize, String sortDir, String sortBy) {
+        // This method can be used to get featured products
+        Pageable pageable = super.createPageable(pageNo, pageSize, sortDir, sortBy);
+        Page<Product> products = productRepository.findByFeatured(featured, pageable);
+        return toPagingResult(products, this::convertToDto);
+    }
+
     @Override
     protected ProductRes convertToDto(Product entity) {
         return productMapper.toDto(entity);

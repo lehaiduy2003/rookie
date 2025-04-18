@@ -7,6 +7,7 @@ import com.example.assignment.enums.MemberTier;
 import com.example.assignment.repository.CustomerRepository;
 import com.example.assignment.service.CustomerService;
 import com.example.assignment.service.impl.paging.CustomerPagingServiceImpl;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerPagingServiceImpl customerPagingService;
 
     @Override
+    @Transactional
     public void updateMemberTier(Long customerId, String memberTier) {
         Customer customer = customerRepository.findById(customerId).orElseThrow(
             () -> new UsernameNotFoundException("Customer not found")

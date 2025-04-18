@@ -12,6 +12,7 @@ import com.example.assignment.repository.CategoryRepository;
 import com.example.assignment.repository.ProductRepository;
 import com.example.assignment.service.ProductService;
 import com.example.assignment.service.impl.paging.ProductPagingServiceImpl;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,7 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
+    @Transactional
     public ProductRes createProduct(ProductCreationReq productCreationReq) {
         Long categoryId = productCreationReq.getCategoryId();
         if (categoryId == null) {
@@ -52,6 +54,7 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
+    @Transactional
     public ProductRes updateProductById(Long id, ProductUpdatingReq productUpdatingReq) {
         Product product = productRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Product not found"));
@@ -63,6 +66,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public void deleteProductById(Long id) {
         Product product = productRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Product not found"));
@@ -70,6 +74,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public ProductRes updateProductCategoryById(Long id, Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
             .orElseThrow(() -> new IllegalArgumentException("Category not found"));
@@ -104,6 +109,24 @@ public class ProductServiceImpl implements ProductService {
     public PagingRes<ProductRes> getProductsByName(String name, Integer pageNo, Integer pageSize, String sortDir, String sortBy) {
         try {
             return productPagingService.getByCriteria(name, pageNo, pageSize, sortDir, sortBy);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("No products found");
+        }
+    }
+
+    @Override
+    @Transactional
+    public void updateToFeaturedProduct(Long id, Boolean isFeatured) {
+        Product product = productRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+        product.setFeatured(isFeatured);
+        productRepository.save(product);
+    }
+
+    @Override
+    public PagingRes<ProductRes> getFeaturedProducts(boolean featured, Integer pageNo, Integer pageSize, String sortDir, String sortBy) {
+        try {
+            return productPagingService.getFeaturedProducts(featured, pageNo, pageSize, sortDir, sortBy);
         } catch (Exception e) {
             throw new IllegalArgumentException("No products found");
         }

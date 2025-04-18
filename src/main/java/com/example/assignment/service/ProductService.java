@@ -88,4 +88,23 @@ public interface ProductService {
      * @return the retrieved product
      */
     PagingRes<ProductRes> getProductsByName(String name, Integer pageNo, Integer pageSize, String sortDir, String sortBy);
+
+    /**
+     * Updates the featured status of a product.
+     *
+     * @param id the id of the product to update
+     * @param isFeatured the new featured status
+     */
+    void updateToFeaturedProduct(Long id, Boolean isFeatured);
+
+    /**
+     * Retrieves a list of featured products using pagination.
+     * @param featured the featured status to filter by
+     * @param pageNo the page number to retrieve
+     * @param pageSize the number of products per page
+     * @param sortDir the direction to sort (ascending or descending)
+     * @param sortBy the field to sort by
+     * @return the retrieved featured product
+     */
+    PagingRes<ProductRes> getFeaturedProducts(boolean featured, Integer pageNo, Integer pageSize, String sortDir, String sortBy);
 }

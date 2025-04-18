@@ -22,6 +22,8 @@ public class Product extends BaseEntityAudit {
     private double avgRating;
     @Column(name = "rating_count")
     private long ratingCount;
+    @Column(name = "is_featured")
+    private boolean featured;
     private int quantity;
     @Column(name = "image_url")
     private String imageUrl;
@@ -40,6 +42,7 @@ public class Product extends BaseEntityAudit {
     @Override
     public void prePersist() {
         super.prePersist();
+        this.featured = false;
         this.isActive = true; // Set default value for isActive
         this.avgRating = 0.0; // Set default value for avgRating
         this.ratingCount = 0; // Set default value for ratingCount
