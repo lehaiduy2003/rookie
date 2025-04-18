@@ -1,5 +1,6 @@
 package com.example.assignment.service.impl.paging;
 
+import com.example.assignment.annotation.Logging;
 import com.example.assignment.dto.response.PagingRes;
 import com.example.assignment.exception.ResourceNotFoundException;
 import com.example.assignment.service.PagingService;
@@ -17,6 +18,7 @@ import java.util.function.Function;
  * @param <E> the type of the entity
  * @param <K> the type of the entity's identifier
  */
+@Logging
 public abstract class PagingServiceImpl<T, E, K> implements PagingService<T, K> {
 
     /**

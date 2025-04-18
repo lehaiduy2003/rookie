@@ -1,5 +1,6 @@
 package com.example.assignment.service.impl;
 
+import com.example.assignment.annotation.Logging;
 import com.example.assignment.dto.request.RatingCreationReq;
 import com.example.assignment.dto.request.RatingUpdatingReq;
 import com.example.assignment.dto.response.PagingRes;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Logging
 public class RatingServiceImpl implements RatingService {
     private final RatingRepository ratingRepository;
     private final ProductRepository productRepository;

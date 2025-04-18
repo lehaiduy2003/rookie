@@ -1,5 +1,6 @@
 package com.example.assignment.service.impl.paging;
 
+import com.example.assignment.annotation.Logging;
 import com.example.assignment.dto.response.PagingRes;
 import com.example.assignment.dto.response.UserRes;
 import com.example.assignment.entity.Customer;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.function.Function;
 
 @Service
+@Logging
 public class CustomerPagingServiceImpl extends PagingServiceImpl<UserRes, Customer, Long> {
     private final CustomerRepository customerRepository;
     private final UserMapper userMapper;

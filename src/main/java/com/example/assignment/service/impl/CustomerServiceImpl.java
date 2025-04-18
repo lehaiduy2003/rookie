@@ -1,5 +1,6 @@
 package com.example.assignment.service.impl;
 
+import com.example.assignment.annotation.Logging;
 import com.example.assignment.dto.response.PagingRes;
 import com.example.assignment.dto.response.UserRes;
 import com.example.assignment.entity.Customer;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Logging
 public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
     private final CustomerPagingServiceImpl customerPagingService;

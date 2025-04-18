@@ -1,5 +1,6 @@
 package com.example.assignment.service.impl;
 
+import com.example.assignment.annotation.Logging;
 import com.example.assignment.dto.request.ProductCreationReq;
 import com.example.assignment.dto.request.ProductUpdatingReq;
 import com.example.assignment.dto.response.PagingRes;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Logging
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;

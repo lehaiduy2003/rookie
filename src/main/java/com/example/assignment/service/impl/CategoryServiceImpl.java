@@ -1,5 +1,6 @@
 package com.example.assignment.service.impl;
 
+import com.example.assignment.annotation.Logging;
 import com.example.assignment.dto.request.CategoryCreationReq;
 import com.example.assignment.dto.response.CategoryRes;
 import com.example.assignment.dto.response.CategoryTreeRes;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Objects;
 @Service
 @RequiredArgsConstructor
+@Logging
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
