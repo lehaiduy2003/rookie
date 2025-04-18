@@ -1,6 +1,5 @@
 package com.example.assignment.config.seed;
 
-import com.example.assignment.config.PasswordEncoderConfig;
 import com.example.assignment.dto.request.UserCreationReq;
 import com.example.assignment.entity.Customer;
 import com.example.assignment.entity.User;
@@ -11,31 +10,28 @@ import com.example.assignment.mapper.UserMapper;
 import com.example.assignment.mapper.UserProfileMapper;
 import com.example.assignment.repository.CustomerRepository;
 import com.example.assignment.repository.UserRepository;
+import com.example.assignment.util.PasswordUtil;
 import jakarta.annotation.Nullable;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
+@RequiredArgsConstructor
 public class UserSeed implements CommandLineRunner {
 
     private final UserRepository userRepository;
     private final CustomerRepository customerRepository;
     private final UserMapper userMapper;
     private final UserProfileMapper userProfileMapper;
-
-    public UserSeed(UserRepository userRepository, CustomerRepository customerRepository, UserMapper userMapper, UserProfileMapper userProfileMapper) {
-        this.userRepository = userRepository;
-        this.customerRepository = customerRepository;
-        this.userMapper = userMapper;
-        this.userProfileMapper = userProfileMapper;
-    }
+    private final PasswordUtil passwordUtil;
 
     private UserCreationReq buildUserCreationReq(String email, String phoneNumber, String password, String firstName, String lastName, String address, Role role, @Nullable MemberTier memberTier) {
         return UserCreationReq.builder()
             .email(email)
             .phoneNumber(phoneNumber)
-            .password(PasswordEncoderConfig.passwordEncoder().encode(password))
+            .password(passwordUtil.encode(password))
             .firstName(firstName)
             .lastName(lastName)
             .address(address)
