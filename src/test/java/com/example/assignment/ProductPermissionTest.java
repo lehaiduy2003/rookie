@@ -6,6 +6,7 @@ import com.example.assignment.entity.Product;
 import com.example.assignment.entity.Rating;
 import com.example.assignment.entity.User;
 import com.example.assignment.enums.Role;
+import com.example.assignment.mapper.ProductMapper;
 import com.example.assignment.repository.CategoryRepository;
 import com.example.assignment.repository.ProductRepository;
 import com.example.assignment.service.impl.ProductServiceImpl;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -32,7 +34,9 @@ import static org.mockito.Mockito.*;
 /**
  * Test class for product permissions and validation logic.
  */
+// errors
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = org.mockito.quality.Strictness.LENIENT)
 class ProductPermissionTest {
 
     @Mock
@@ -43,6 +47,13 @@ class ProductPermissionTest {
 
     @Mock
     private User adminUser;
+
+    // For auto-inject to ProductServiceImpl
+    // Without this mock, ProductMapper can not be injected to ProductServiceImpl
+    // Therefore, the test will fail because of NullPointerException
+    @Mock
+    @SuppressWarnings("unused")
+    private ProductMapper productMapper;
 
     @Mock
     private User customerUser;

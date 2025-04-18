@@ -8,8 +8,6 @@ import com.example.assignment.entity.Product;
 import com.example.assignment.entity.Rating;
 import com.example.assignment.exception.ResourceNotFoundException;
 import com.example.assignment.mapper.RatingMapper;
-import com.example.assignment.repository.CustomerRepository;
-import com.example.assignment.repository.ProductRepository;
 import com.example.assignment.repository.RatingRepository;
 import com.example.assignment.service.impl.RatingServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,12 +31,6 @@ class RatingServiceTest {
 
     @Mock
     private RatingRepository ratingRepository;
-
-    @Mock
-    private ProductRepository productRepository;
-
-    @Mock
-    private CustomerRepository customerRepository;
 
     @Mock
     private RatingMapper ratingMapper; // Add this mock

@@ -1,6 +1,5 @@
-package com.example.assignment;
+package com.example.assignment.controller;
 
-import com.example.assignment.controller.CategoryController;
 import com.example.assignment.dto.request.CategoryCreationReq;
 import com.example.assignment.dto.response.CategoryRes;
 import com.example.assignment.entity.User;
@@ -16,9 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -44,31 +40,19 @@ class CategoryControllerTest {
     @Mock
     private User customerUser;
 
-    @Mock
-    private Authentication authentication;
-
-    @Mock
-    private SecurityContext securityContext;
-
     @InjectMocks
     private CategoryController categoryController;
+    // Authorization Tests
 
     @BeforeEach
     void setUp() {
-        // Setup common mocks for all tests
-        when(adminUser.getRole()).thenReturn(Role.ADMIN);
-        when(customerUser.getRole()).thenReturn(Role.CUSTOMER);
+        lenient().when(adminUser.getRole()).thenReturn(Role.ADMIN);
+        lenient().when(customerUser.getRole()).thenReturn(Role.CUSTOMER);
     }
-
-    // Authorization Tests
 
     @Test
     @DisplayName("Test admin can create category")
     void testAdminCanCreateCategory() {
-        // Setup
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.getPrincipal()).thenReturn(adminUser);
-        SecurityContextHolder.setContext(securityContext);
 
         CategoryCreationReq req = CategoryCreationReq.builder()
                 .name("Test Category")
@@ -95,10 +79,6 @@ class CategoryControllerTest {
     @Test
     @DisplayName("Test non-admin cannot create category")
     void testNonAdminCannotCreateCategory() {
-        // Setup
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.getPrincipal()).thenReturn(customerUser);
-        SecurityContextHolder.setContext(securityContext);
 
         CategoryCreationReq req = CategoryCreationReq.builder()
                 .name("Test Category")
@@ -120,10 +100,6 @@ class CategoryControllerTest {
     @Test
     @DisplayName("Test admin can update category")
     void testAdminCanUpdateCategory() {
-        // Setup
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.getPrincipal()).thenReturn(adminUser);
-        SecurityContextHolder.setContext(securityContext);
 
         CategoryCreationReq req = CategoryCreationReq.builder()
                 .name("Updated Category")
@@ -150,10 +126,6 @@ class CategoryControllerTest {
     @Test
     @DisplayName("Test non-admin cannot update category")
     void testNonAdminCannotUpdateCategory() {
-        // Setup
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.getPrincipal()).thenReturn(customerUser);
-        SecurityContextHolder.setContext(securityContext);
 
         CategoryCreationReq req = CategoryCreationReq.builder()
                 .name("Updated Category")
@@ -172,10 +144,6 @@ class CategoryControllerTest {
     @Test
     @DisplayName("Test admin can delete category")
     void testAdminCanDeleteCategory() {
-        // Setup
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.getPrincipal()).thenReturn(adminUser);
-        SecurityContextHolder.setContext(securityContext);
 
         doNothing().when(categoryService).deleteCategoryById(anyLong());
 
@@ -190,11 +158,6 @@ class CategoryControllerTest {
     @Test
     @DisplayName("Test non-admin cannot delete category")
     void testNonAdminCannotDeleteCategory() {
-        // Setup
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.getPrincipal()).thenReturn(customerUser);
-        SecurityContextHolder.setContext(securityContext);
-
         // Simulate Spring Security behavior
         doThrow(new AccessDeniedException("Access denied")).when(categoryService).deleteCategoryById(anyLong());
 
@@ -208,10 +171,6 @@ class CategoryControllerTest {
     @Test
     @DisplayName("Test category name cannot be null")
     void testCategoryNameCannotBeNull() {
-        // Setup
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.getPrincipal()).thenReturn(adminUser);
-        SecurityContextHolder.setContext(securityContext);
 
         CategoryCreationReq req = CategoryCreationReq.builder()
                 .name(null)
@@ -229,10 +188,6 @@ class CategoryControllerTest {
     @Test
     @DisplayName("Test category name cannot be duplicate")
     void testCategoryNameCannotBeDuplicate() {
-        // Setup
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.getPrincipal()).thenReturn(adminUser);
-        SecurityContextHolder.setContext(securityContext);
 
         CategoryCreationReq req = CategoryCreationReq.builder()
                 .name("Existing Category")
@@ -252,10 +207,6 @@ class CategoryControllerTest {
     @Test
     @DisplayName("Test category cannot have itself as parent")
     void testCategoryCannotHaveItselfAsParent() {
-        // Setup
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        when(authentication.getPrincipal()).thenReturn(adminUser);
-        SecurityContextHolder.setContext(securityContext);
 
         CategoryCreationReq req = CategoryCreationReq.builder()
                 .name("Test Category")

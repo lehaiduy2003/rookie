@@ -13,7 +13,10 @@ import com.example.assignment.entity.UserProfile;
 import com.example.assignment.enums.Role;
 import com.example.assignment.mapper.CategoryMapper;
 import com.example.assignment.mapper.ProductMapper;
+import com.example.assignment.mapper.UserMapper;
+import com.example.assignment.mapper.UserProfileMapper;
 import com.example.assignment.repository.CategoryRepository;
+import com.example.assignment.repository.CustomerRepository;
 import com.example.assignment.repository.ProductRepository;
 import com.example.assignment.repository.UserRepository;
 import com.example.assignment.service.impl.CategoryServiceImpl;
@@ -27,6 +30,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -45,7 +49,7 @@ import static org.mockito.Mockito.when;
  * This class tests that the audit provider correctly sets the user who created/updated entities.
  */
 @ExtendWith(MockitoExtension.class)
-@org.mockito.junit.jupiter.MockitoSettings(strictness = org.mockito.quality.Strictness.LENIENT)
+@MockitoSettings(strictness = org.mockito.quality.Strictness.LENIENT)
 class AuditProviderTest {
 
     @Mock
@@ -64,13 +68,13 @@ class AuditProviderTest {
     private ProductMapper productMapper;
 
     @Mock
-    private com.example.assignment.mapper.UserMapper userMapper;
+    private UserMapper userMapper;
 
     @Mock
-    private com.example.assignment.mapper.UserProfileMapper userProfileMapper;
+    private UserProfileMapper userProfileMapper;
 
     @Mock
-    private com.example.assignment.repository.CustomerRepository customerRepository;
+    private CustomerRepository customerRepository;
 
     @Mock
     private Authentication authentication;
