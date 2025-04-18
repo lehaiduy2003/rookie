@@ -6,6 +6,7 @@ import com.example.assignment.dto.response.CategoryTreeRes;
 import com.example.assignment.service.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class CategoryController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryRes> createCategory(@Valid @RequestBody CategoryCreationReq categoryCreationReq) {
         try {
             CategoryRes createdCategory = categoryService.createCategory(categoryCreationReq);
@@ -30,6 +32,7 @@ public class CategoryController {
     }
 
     @PutMapping("/{categoryId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryRes> updateCategory(@PathVariable Long categoryId, @Valid @RequestBody CategoryCreationReq categoryCreationReq) {
         try {
             CategoryRes updatedCategory = categoryService.updateCategoryById(categoryId, categoryCreationReq);
@@ -40,6 +43,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{categoryId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId) {
         try {
             categoryService.deleteCategoryById(categoryId);
@@ -50,6 +54,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{categoryId}/force")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> forceDeleteCategory(@PathVariable Long categoryId) {
         try {
             categoryService.forceDeleteCategoryById(categoryId);
