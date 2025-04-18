@@ -12,6 +12,5 @@ public final class SecurityURL {
         "/api/v1/products/search",                // searchProducts
         "/api/v1/products/category/{categoryId}", // getProductsByCategoryId
         "/api/v1/ratings/product/{productId}",    // getRatingsByProductId
-        "/api/v1/users/{id}"                      // getUserById
     };
 }
