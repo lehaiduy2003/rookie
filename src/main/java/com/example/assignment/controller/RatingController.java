@@ -8,6 +8,7 @@ import com.example.assignment.exception.ResourceNotFoundException;
 import com.example.assignment.service.RatingService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,6 +21,7 @@ public class RatingController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<RatingRes> createRating(@Valid @RequestBody RatingCreationReq ratingCreationReq) {
         RatingRes createdRating = ratingService.createRating(ratingCreationReq);
         return ResponseEntity.status(201).body(createdRating);
@@ -82,6 +84,7 @@ public class RatingController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<RatingRes> updateRating(@PathVariable Long id, @Valid @RequestBody RatingUpdatingReq ratingUpdatingReq) {
         try {
             RatingRes updatedRating = ratingService.updateRating(id, ratingUpdatingReq);
@@ -96,6 +99,7 @@ public class RatingController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<Void> deleteRating(@PathVariable Long id) {
         try {
             ratingService.deleteRating(id);

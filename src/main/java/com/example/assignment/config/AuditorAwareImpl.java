@@ -1,33 +1,34 @@
 package com.example.assignment.config;
 
 import com.example.assignment.entity.User;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import org.springframework.data.domain.AuditorAware;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+/**
+ * This class implements the AuditorAware interface to provide the current auditor
+ * for auditing purposes.
+ * It retrieves the current authenticated user from the security context.
+ */
 @Component("auditorProvider")
 public class AuditorAwareImpl implements AuditorAware<User> {
-    @PersistenceContext
-    private EntityManager entityManager;
-
-    public AuditorAwareImpl(EntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
 
     /**
-     * TODO: Implement this method to return the current auditor.
-     * Get the current auditor.
-     * @return the current auditor
+     * This method retrieves the current auditor (user) from the security context.
+     * @return an Optional containing the current user if authenticated, otherwise an empty Optional
      */
     @Override
     public Optional<User> getCurrentAuditor() {
-        // hardcode the user for now
-        // TODO: replace with actual user retrieval logic
-        User user = entityManager.find(User.class, 552L); // hardcoded user ID
-        return Optional.ofNullable(user);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
+            return Optional.empty();
+        }
+
+        return Optional.ofNullable((User) authentication.getPrincipal());
     }
 }
 
