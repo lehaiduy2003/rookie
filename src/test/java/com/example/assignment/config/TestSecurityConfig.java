@@ -1,18 +1,17 @@
 package com.example.assignment.config;
 
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
  * Test-specific security configuration for unit tests.
  * This simplified configuration allows all requests and doesn't depend on other beans.
+ * Use @TestConfiguration to ensure this configuration is only used in test contexts.
  */
-@Configuration
-@EnableWebSecurity
+@TestConfiguration
 public class TestSecurityConfig {
 
     @Bean
