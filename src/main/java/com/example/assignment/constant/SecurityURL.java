@@ -8,6 +8,7 @@ public final class SecurityURL {
         "/api/v1/categories/tree",                // getCategoryTree
         "/api/v1/categories/tree/{categoryId}",   // getCategoryTreeByParentId
         "/api/v1/products/{id}",                  // getProduct
+        "/api/v1/products",                       // getProducts
         "/api/v1/products/search",                // searchProducts
         "/api/v1/products/category/{categoryId}", // getProductsByCategoryId
         "/api/v1/ratings/product/{productId}",    // getRatingsByProductId
