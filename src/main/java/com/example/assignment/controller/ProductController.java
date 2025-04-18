@@ -27,13 +27,19 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<PagingRes<ProductRes>> getProducts(
+        @RequestParam(defaultValue = "false") Boolean featured,
         @RequestParam(defaultValue = "0") Integer pageNo,
         @RequestParam(defaultValue = "10") Integer pageSize,
         @RequestParam(defaultValue = "id") String sortBy,
         @RequestParam(defaultValue = "asc") String sortDir
     ) {
-        PagingRes<ProductRes> products = productService.getProducts(pageNo, pageSize, sortDir, sortBy);
-        return ResponseEntity.ok(products);
+        if (Boolean.TRUE.equals(featured)) {
+            PagingRes<ProductRes> featuredProducts = getFeaturedProducts(pageNo, pageSize, sortBy, sortDir);
+            return ResponseEntity.ok(featuredProducts);
+        } else {
+            PagingRes<ProductRes> products = productService.getProducts(pageNo, pageSize, sortDir, sortBy);
+            return ResponseEntity.ok(products);
+        }
     }
 
     @PostMapping
@@ -85,5 +91,20 @@ public class ProductController {
     ) {
         PagingRes<ProductRes> products = productService.getProductsByName(name, pageNo, pageSize, sortDir, sortBy);
         return ResponseEntity.ok(products);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Void> updateFeaturedProduct(@PathVariable Long id, @RequestParam(defaultValue = "false") Boolean featured) {
+        productService.updateToFeaturedProduct(id, featured);
+        return ResponseEntity.noContent().build();
+    }
+
+    private PagingRes<ProductRes> getFeaturedProducts(
+        Integer pageNo,
+        Integer pageSize,
+        String sortBy,
+        String sortDir
+    ) {
+        return productService.getFeaturedProducts(true, pageNo, pageSize, sortDir, sortBy);
     }
 }
