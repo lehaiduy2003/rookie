@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserRes createUser(UserCreationReq userCreationReq) {
+    public UserDetailsRes createUser(UserCreationReq userCreationReq) {
         // check if the user already exists
         if (userRepository.existsUserByEmail(userCreationReq.getEmail())) {
             throw new ResourceAlreadyExistException("User already exists");
@@ -63,12 +63,12 @@ public class UserServiceImpl implements UserService {
         user.setUserProfile(userProfile);
         userProfile.setUser(user);
         customerRepository.save(user);
-        return userMapper.toDto(user);
+        return userMapper.toUserDetailsDto(user);
     }
 
     @Override
     @Transactional
-    public UserRes updateUserById(Long id, UserInfoUpdatingReq userInfoUpdatingReq) {
+    public UserDetailsRes updateUserById(Long id, UserInfoUpdatingReq userInfoUpdatingReq) {
         User user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         UserProfile existingUserProfile = user.getUserProfile();
         existingUserProfile.setFirstName(userInfoUpdatingReq.getFirstName());
@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService {
         existingUserProfile.setAvatar(userInfoUpdatingReq.getAvatar());
         user.setUserProfile(existingUserProfile);
         User updatedUser = userRepository.save(user);
-        return userMapper.toDto(updatedUser);
+        return userMapper.toUserDetailsDto(updatedUser);
     }
 
     @Override
