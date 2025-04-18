@@ -6,6 +6,7 @@ import com.example.assignment.dto.response.PagingRes;
 import com.example.assignment.dto.response.ProductDetailRes;
 import com.example.assignment.dto.response.ProductRes;
 import com.example.assignment.service.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -39,14 +40,15 @@ public class ProductController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<ProductRes> createProduct(@RequestBody ProductCreationReq productCreationReq) {
+    public ResponseEntity<ProductRes> createProduct(@Valid @RequestBody ProductCreationReq productCreationReq) {
         ProductRes createdProduct = productService.createProduct(productCreationReq);
         return ResponseEntity.status(201).body(createdProduct);
     }
 
-    @PreAuthorize("hasRole({'ADMIN'})")
+    @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}")
-    public ResponseEntity<ProductRes> updateProductById(@PathVariable Long id, @RequestBody ProductUpdatingReq productUpdatingReq) {
+    public ResponseEntity<ProductRes> updateProductById(@PathVariable Long id, @Valid @RequestBody ProductUpdatingReq productUpdatingReq) {
+        // Permission check is handled in the service layer
         ProductRes updatedProduct = productService.updateProductById(id, productUpdatingReq);
         return ResponseEntity.ok(updatedProduct);
     }
