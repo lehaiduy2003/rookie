@@ -83,8 +83,8 @@ public class RatingController {
         }
     }
 
-    @PatchMapping("/{id}")
     @PreAuthorize("hasRole('CUSTOMER')")
+    @PatchMapping("/{id}")
     public ResponseEntity<RatingRes> updateRating(@PathVariable Long id, @Valid @RequestBody RatingUpdatingReq ratingUpdatingReq) {
         try {
             RatingRes updatedRating = ratingService.updateRating(id, ratingUpdatingReq);
@@ -98,8 +98,8 @@ public class RatingController {
         }
     }
 
-    @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('CUSTOMER')")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRating(@PathVariable Long id) {
         try {
             ratingService.deleteRating(id);
