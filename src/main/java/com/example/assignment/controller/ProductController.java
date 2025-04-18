@@ -34,8 +34,12 @@ public class ProductController {
         @RequestParam(defaultValue = "id") String sortBy,
         @RequestParam(defaultValue = "asc") String sortDir
     ) {
-        PagingRes<ProductRes> featuredProducts = getFeaturedProducts(pageNo, pageSize, sortBy, sortDir);
-        return ResponseEntity.ok(featuredProducts);
+        if(Boolean.TRUE.equals(featured)) {
+            PagingRes<ProductRes> featuredProducts = getFeaturedProducts(pageNo, pageSize, sortBy, sortDir);
+            return ResponseEntity.ok(featuredProducts);
+        }
+        PagingRes<ProductRes> products = productService.getProducts(pageNo, pageSize, sortDir, sortBy);
+        return ResponseEntity.ok(products);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -45,7 +49,7 @@ public class ProductController {
         return ResponseEntity.status(201).body(createdProduct);
     }
 
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<ProductRes> updateProductById(@PathVariable Long id, @Valid @RequestBody ProductUpdatingReq productUpdatingReq) {
         // Permission check is handled in the service layer
@@ -53,7 +57,7 @@ public class ProductController {
         return ResponseEntity.ok(updatedProduct);
     }
 
-    @PreAuthorize("hasRole({'ADMIN'})")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProductById(@PathVariable Long id) {
         productService.deleteProductById(id);
