@@ -1,5 +1,6 @@
 package com.example.assignment.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.*;
@@ -22,6 +23,7 @@ public class Cart {
     private Customer customer;
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude
+    @JsonIgnore
     private Set<CartItem> items;
     @Min(value = 0, message = "Total must be at least 0")
     private double total;

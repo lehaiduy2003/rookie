@@ -8,15 +8,32 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+/**
+ * This class implements the AuditorAware interface to provide the current auditor
+ * for auditing purposes.
+ * It retrieves the current authenticated user from the security context.
+ */
 @Component("auditorProvider")
 public class AuditorAwareImpl implements AuditorAware<User> {
 
+    /**
+     * This method retrieves the current auditor (user) from the security context.
+     * @return an Optional containing the current user if authenticated, otherwise an empty Optional
+     */
     @Override
     public Optional<User> getCurrentAuditor() {
-        // Get the current authentication from the security context
-        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
-            .filter(Authentication::isAuthenticated)
-            .map(auth -> (User) auth.getPrincipal());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return Optional.empty();
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (principal == null || principal.equals("anonymousUser") || !(principal instanceof User)) {
+            return Optional.empty();
+        }
+
+        return Optional.of((User) principal);
     }
 }
-
