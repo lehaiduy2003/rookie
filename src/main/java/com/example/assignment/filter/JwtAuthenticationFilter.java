@@ -12,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -57,13 +58,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
                 
                 // Validate JWT token
-                if (jwtProvider.validateToken(jwt, userDetails)) {
+                if (Boolean.TRUE.equals(jwtProvider.validateToken(jwt, userDetails))) {
                     // Create an authentication token
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
                             userDetails.getAuthorities()
                     );
+
+                    // Set details for the authentication token
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                     // Set authentication in SecurityContext
                     SecurityContextHolder.getContext().setAuthentication(authToken);
