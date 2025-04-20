@@ -10,12 +10,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 /**
  * Controller for handling authentication requests.
@@ -81,10 +82,10 @@ public class AuthController {
      * @param request the HTTP request containing the refresh token cookie
      * @return the response containing the new access token
      */
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/refresh")
-    public ResponseEntity<String> refreshToken(HttpServletRequest request) {
+    public ResponseEntity<Map<String, String>> refreshToken(HttpServletRequest request) {
         String accessToken = authService.refreshToken(request);
-        return ResponseEntity.ok(accessToken);
+        Map<String, String> data = Map.of("accessToken", accessToken);
+        return ResponseEntity.ok(data);
     }
 }
