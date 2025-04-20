@@ -1,6 +1,5 @@
 package com.example.assignment.config;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -36,13 +35,7 @@ public class WebConfig implements WebMvcConfigurer {
         configurer.defaultContentType(org.springframework.http.MediaType.APPLICATION_JSON);
     }
 
-    /**
-     * CORS configuration bean to allow cross-origin requests.
-     * This bean configures the allowed origins, methods, and headers for CORS requests.
-     * @return CorsConfigurationSource instance
-     */
-    @Bean
-    public static CorsConfigurationSource corsConfigurationSource() {
+    private static CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(ALLOWED_ORIGINS));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
@@ -52,6 +45,16 @@ public class WebConfig implements WebMvcConfigurer {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    /**
+     * Configures CORS settings for the application.
+     * This method sets the allowed origins, methods, and headers for CORS requests.
+     * @param http the HttpSecurity object to configure
+     * @throws Exception if an error occurs during configuration
+     */
+    public static void configureCORS(HttpSecurity http) throws Exception {
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
     }
 
     /**

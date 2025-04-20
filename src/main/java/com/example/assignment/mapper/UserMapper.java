@@ -52,6 +52,10 @@ public interface UserMapper extends PagingMapper {
     @Mapping(source = "user.userProfile.firstName", target = "firstName")
     @Mapping(source = "user.userProfile.lastName", target = "lastName")
     @Mapping(source = "user.userProfile.avatar", target = "avatar")
+    @Mapping(source = "user.userProfile.address", target = "address")
+    @Mapping(source = "user.userProfile.bio", target = "bio")
+    @Mapping(source = "user.userProfile.dob", target = "dob")
+    @Mapping(source = "user.userProfile.phoneNumber", target = "phoneNumber")
     @SubclassMapping(source = Customer.class, target = UserDetailsRes.class)
     UserDetailsRes toUserDetailsDto(User user);
     /**
