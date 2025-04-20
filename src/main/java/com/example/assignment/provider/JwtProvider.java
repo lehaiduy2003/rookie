@@ -92,11 +92,6 @@ public class JwtProvider {
         return false; // return false if any exception occurs
     }
 
-    public Boolean iscorrectUser(String token, User user) {
-        String username = extractUsername(token);
-        return (username.equals(user.getUsername()));
-    }
-
     private SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
