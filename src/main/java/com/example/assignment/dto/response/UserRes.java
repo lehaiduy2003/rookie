@@ -11,4 +11,5 @@ public class UserRes {
     private String avatar;
     private String role;
     private String memberTier;
+    private boolean isActive;
 }
