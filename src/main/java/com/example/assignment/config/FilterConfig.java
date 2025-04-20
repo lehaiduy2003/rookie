@@ -2,8 +2,8 @@ package com.example.assignment.config;
 
 import com.example.assignment.filter.JwtAuthenticationFilter;
 import com.example.assignment.provider.JwtProvider;
+import com.example.assignment.service.UserService;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 /**
@@ -19,7 +19,7 @@ public class FilterConfig {
      * @return a JwtAuthenticationFilter bean
      */
     @Bean
-    JwtAuthenticationFilter jwtAuthenticationFilter(JwtProvider jwtProvider, UserDetailsService userService) {
+    JwtAuthenticationFilter jwtAuthenticationFilter(JwtProvider jwtProvider, UserService userService) {
         return new JwtAuthenticationFilter(jwtProvider, userService);
     }
 }
