@@ -12,4 +12,5 @@ public class ProductRes {
     private String imageUrl;
     private Boolean isActive;
     private Double avgRating;
+    private Long ratingCount;
 }
