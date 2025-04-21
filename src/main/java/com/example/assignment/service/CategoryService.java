@@ -68,4 +68,11 @@ public interface CategoryService {
      */
     List<CategoryTreeRes> getCategoryTree();
 
+    /**
+     * Retrieves a list of top-level categories.
+     * This method will return categories that do not have a parent category.
+     * @return a list of top-level categories
+     */
+    List<CategoryRes> getTopLevelCategories();
+
 }

@@ -24,4 +24,10 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
      * @return a category with the given name, ignoring case
      */
     Category findCategoryByNameContainingIgnoreCase(String name);
+
+    /**
+     * Find all root categories (categories without a parent).
+     * @return a list of root categories
+     */
+    List<Category> findCategoriesByParentIsNull(); // Find all root categories
 }
