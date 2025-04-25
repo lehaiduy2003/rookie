@@ -4,7 +4,6 @@ import com.example.assignment.entity.Customer;
 import com.example.assignment.enums.MemberTier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * Repository interface for managing Customer entities.
@@ -12,7 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * It includes a method for finding customers by their member tier.
  * The method uses pagination to return a page of customers.
  */
-public interface CustomerRepository extends JpaRepository<Customer, Long> {
+public interface CustomerRepository extends BaseRepository<Customer, Long> {
     /**
      * Finds a page of customers by their member tier.
      *

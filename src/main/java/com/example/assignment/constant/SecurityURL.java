@@ -5,6 +5,8 @@ public final class SecurityURL {
     public static final String[] PUBLIC_URLS = {
         "/api/v1/auth/**",                    // auth
         "/swagger-ui/**",                     // swagger-ui
+        "/v3/api-docs/**",                    // api-docs
+        "/api/v1/categories/parents",          // getTopLevelCategories
         "/api/v1/categories/tree",            // getCategoryTree
         "/api/v1/categories/tree/*",          // getCategoryTreeByParentId
         "/api/v1/categories/*",               // getCategoryById

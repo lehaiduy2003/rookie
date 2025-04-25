@@ -40,9 +40,10 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthRes> register(
             @Valid @RequestBody RegisterReq registerReq,
+            HttpServletRequest request,
             HttpServletResponse response
     ) {
-        AuthRes authRes = authService.register(registerReq, response);
+        AuthRes authRes = authService.register(registerReq, request, response);
         return ResponseEntity.status(HttpStatus.CREATED).body(authRes);
     }
 
@@ -56,9 +57,10 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthRes> login(
             @Valid @RequestBody LoginReq loginReq,
+            HttpServletRequest request,
             HttpServletResponse response
     ) {
-        AuthRes authRes = authService.login(loginReq, response);
+        AuthRes authRes = authService.login(loginReq, request, response);
         return ResponseEntity.ok(authRes);
     }
 

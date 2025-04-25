@@ -8,6 +8,9 @@ import com.example.assignment.dto.response.AuthRes;
 import com.example.assignment.dto.response.UserDetailsRes;
 import com.example.assignment.entity.User;
 import com.example.assignment.enums.Role;
+import com.example.assignment.exception.ExistingResourceException;
+import com.example.assignment.exception.ResourceNotFoundException;
+import com.example.assignment.exception.UnAuthorizedException;
 import com.example.assignment.service.AuthService;
 import com.example.assignment.service.UserService;
 import com.example.assignment.util.CookieUtil;
@@ -19,12 +22,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -38,11 +39,16 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public AuthRes register(RegisterReq registerReq, HttpServletResponse response) {
+    public AuthRes register(RegisterReq registerReq, HttpServletRequest request, HttpServletResponse response) {
         // Create user creation request from register request
+        // Check if the email already exists
+        if (userService.existsByEmail(registerReq.getEmail())) {
+            throw new ExistingResourceException("User with this email already exists");
+        }
+        // Create a new user creation request
         UserCreationReq userCreationReq = UserCreationReq.builder()
                 .email(registerReq.getEmail())
-                .password(passwordUtil.encode(registerReq.getPassword()))
+                .password(registerReq.getPassword()) // the password is already hashed in the UserService
                 .firstName(registerReq.getFirstName())
                 .lastName(registerReq.getLastName())
                 .phoneNumber(registerReq.getPhoneNumber())
@@ -63,9 +69,7 @@ public class AuthServiceImpl implements AuthService {
         cookieUtil.addRefreshTokenCookie(response, refreshToken);
 
         // Set authentication in a security context
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                user, null, user.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        setAuth(user, request);
 
         // Get user details
         UserDetailsRes userDetailsRes = userService.getUserById(user.getId());
@@ -75,24 +79,22 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthRes login(LoginReq loginReq, HttpServletResponse response) {
+    public AuthRes login(LoginReq loginReq, HttpServletRequest request, HttpServletResponse response) {
         // Load user from database
         User user = (User) userService.loadUserByUsername(loginReq.getEmail());
 
         // Check if a user exists
         if (user == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+            throw new ResourceNotFoundException("User's email not found");
         }
 
         // Verify password
         if (!passwordUtil.matches(loginReq.getPassword(), user.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+            throw new UnAuthorizedException("Invalid password");
         }
 
         // Set authentication in a security context
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                user, null, user.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        setAuth(user, request);
 
         // Generate tokens
         String accessToken = jwtProvider.generateAccessToken(user);
@@ -123,7 +125,7 @@ public class AuthServiceImpl implements AuthService {
         String refreshToken = cookieUtil.extractRefreshTokenFromCookie(request);
 
         if (refreshToken == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token not found");
+            throw new UnAuthorizedException("Refresh token not found");
         }
 
         try {
@@ -131,31 +133,40 @@ public class AuthServiceImpl implements AuthService {
             String username = jwtProvider.extractUsername(refreshToken);
 
             if (username == null) {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid refresh token");
+                throw new UnAuthorizedException("Invalid refresh token");
             }
             // Load user details
             User user = (User) userService.loadUserByUsername(username);
 
             // Validate refresh token
             if (!Boolean.TRUE.equals(jwtProvider.validateToken(refreshToken))) {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid refresh token");
+                throw new UnAuthorizedException("Invalid refresh token");
             }
 
             // Generate a new access token
             String accessToken = jwtProvider.generateAccessToken(user);
 
             // Set authentication in a security context
-            Authentication authentication = new UsernamePasswordAuthenticationToken(
-                user, null, user.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            setAuth(user, request);
 
             // Return only the access token
             return accessToken;
 
         } catch (ExpiredJwtException e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token expired");
+            throw new UnAuthorizedException("Refresh token expired");
         } catch (JwtException e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid refresh token");
+            throw new UnAuthorizedException("Invalid refresh token");
         }
+    }
+
+    private void setAuth(User user, HttpServletRequest request) {
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                user,
+                null,
+                user.getAuthorities()
+        );
+        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(authToken);
+
     }
 }
