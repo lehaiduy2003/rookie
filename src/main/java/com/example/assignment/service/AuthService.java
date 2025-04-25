@@ -19,7 +19,7 @@ public interface AuthService {
      * @param response the HTTP response to set cookies
      * @return the authentication response containing user details and tokens
      */
-    AuthRes register(RegisterReq registerReq, HttpServletResponse response);
+    AuthRes register(RegisterReq registerReq, HttpServletRequest request, HttpServletResponse response);
 
     /**
      * Authenticates a user.
@@ -28,7 +28,7 @@ public interface AuthService {
      * @param response the HTTP response to set cookies
      * @return the authentication response containing user details and tokens
      */
-    AuthRes login(LoginReq loginReq, HttpServletResponse response);
+    AuthRes login(LoginReq loginReq, HttpServletRequest request, HttpServletResponse response);
 
     /**
      * Logs out the current user.
