@@ -34,6 +34,6 @@ public interface CustomerService {
      * @param sortBy the field to sort by
      * @return a pageable result of customers
      */
-    PagingRes<UserRes> getCustomers(Integer pageNo, Integer pageSize, String sortDir, String sortBy);
+    PagingRes<UserRes> getCustomers(String name, String memberTier, Integer pageNo, Integer pageSize, String sortDir, String sortBy);
 
 }

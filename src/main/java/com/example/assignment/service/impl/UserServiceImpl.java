@@ -5,7 +5,8 @@ import com.example.assignment.dto.response.PagingRes;
 import com.example.assignment.dto.response.UserDetailsRes;
 import com.example.assignment.dto.response.UserRes;
 import com.example.assignment.entity.Customer;
-import com.example.assignment.exception.ResourceAlreadyExistException;
+import com.example.assignment.exception.ExistingResourceException;
+import com.example.assignment.repository.BaseRepository;
 import com.example.assignment.repository.CustomerRepository;
 import com.example.assignment.repository.UserRepository;
 import com.example.assignment.service.UserService;
@@ -15,14 +16,16 @@ import com.example.assignment.entity.User;
 import com.example.assignment.entity.UserProfile;
 import com.example.assignment.mapper.UserMapper;
 import com.example.assignment.mapper.UserProfileMapper;
-import com.example.assignment.service.impl.paging.UserPagingServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.function.Function;
 
 /**
  * Service implementation for managing user (CRUD) operations.
@@ -34,13 +37,27 @@ import java.util.ArrayList;
 @Service
 @RequiredArgsConstructor
 @Logging
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends PagingServiceImpl<UserRes, User, Long> implements UserService {
     private final UserRepository userRepository;
     private final CustomerRepository customerRepository;
     private final UserMapper userMapper;
     private final UserProfileMapper userProfileMapper;
-    private final UserPagingServiceImpl userPagingService;
+    private final PasswordEncoder passwordEncoder;
 
+    @Override
+    protected BaseRepository<User, Long> getRepository() {
+        return userRepository;
+    }
+
+    @Override
+    protected UserRes convertToDto(User entity) {
+        return userMapper.toDto(entity);
+    }
+
+    @Override
+    protected PagingRes<UserRes> toPagingResult(Page<User> page, Function<User, UserRes> converter) {
+        return userMapper.toPagingResult(page, converter);
+    }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -56,10 +73,12 @@ public class UserServiceImpl implements UserService {
     public UserDetailsRes createUser(UserCreationReq userCreationReq) {
         // check if the user already exists
         if (userRepository.existsUserByEmail(userCreationReq.getEmail())) {
-            throw new ResourceAlreadyExistException("User already exists");
+            throw new ExistingResourceException("User already exists");
         }
         UserProfile userProfile = userProfileMapper.toEntity(userCreationReq);
         Customer user = userMapper.toCustomer(userCreationReq, userProfile);
+        String encodedPassword = passwordEncoder.encode(userCreationReq.getPassword());
+        user.setPassword(encodedPassword);// Assuming password is already encoded
         user.setUserProfile(userProfile);
         userProfile.setUser(user);
         customerRepository.save(user);
@@ -97,7 +116,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public PagingRes<UserRes> getUsers(Integer pageNo, Integer pageSize, String sortDir, String sortBy) {
         try {
-            return userPagingService.getMany(pageNo, pageSize, sortDir, sortBy);
+            return getMany(null, pageNo, pageSize, sortDir, sortBy);
         } catch (Exception e) {
             // More appropriate to return an empty result than throw an exception
             return PagingRes.<UserRes>builder()
@@ -117,4 +136,8 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserDetailsDto(user);
     }
 
+    @Override
+    public boolean existsByEmail(String email) {
+        return userRepository.existsUserByEmail(email);
+    }
 }
