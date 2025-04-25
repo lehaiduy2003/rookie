@@ -1,9 +1,9 @@
 package com.example.assignment.config;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 
 /**
  * Security configuration class to set up password encoding.
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
  * It provides a bean for the PasswordEncoder to be used for encoding and matching passwords.
  * It uses BCryptPasswordEncoder for secure password hashing.
  */
-@Component
+@Configuration
 public class PasswordEncoderConfig {
     /**
      * Bean to configure the password encoder.

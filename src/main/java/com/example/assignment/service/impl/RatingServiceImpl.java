@@ -10,26 +10,44 @@ import com.example.assignment.entity.Product;
 import com.example.assignment.entity.Rating;
 import com.example.assignment.exception.ResourceNotFoundException;
 import com.example.assignment.mapper.RatingMapper;
+import com.example.assignment.repository.BaseRepository;
 import com.example.assignment.repository.CustomerRepository;
 import com.example.assignment.repository.ProductRepository;
 import com.example.assignment.repository.RatingRepository;
 import com.example.assignment.service.RatingService;
-import com.example.assignment.service.impl.paging.RatingPagingServiceImpl;
+import com.example.assignment.specification.RatingSpecification;
+import com.example.assignment.util.SpecificationBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
 @Logging
-public class RatingServiceImpl implements RatingService {
+public class RatingServiceImpl extends PagingServiceImpl<RatingRes, Rating, Long> implements RatingService {
     private final RatingRepository ratingRepository;
     private final ProductRepository productRepository;
     private final CustomerRepository customerRepository;
     private final RatingMapper ratingMapper;
-    private final RatingPagingServiceImpl ratingPagingService;
+
+    @Override
+    protected BaseRepository<Rating, Long> getRepository() {
+        return ratingRepository;
+    }
+
+    @Override
+    protected RatingRes convertToDto(Rating entity) {
+        return ratingMapper.toDto(entity);
+    }
+
+    @Override
+    protected PagingRes<RatingRes> toPagingResult(Page<Rating> page, Function<Rating, RatingRes> converter) {
+        return ratingMapper.toPagingResult(page, converter);
+    }
 
     @Override
     @Transactional
@@ -70,7 +88,7 @@ public class RatingServiceImpl implements RatingService {
 
     @Override
     public PagingRes<RatingRes> getAllRatings(Integer pageNo, Integer pageSize, String sortDir, String sortBy) {
-        return ratingPagingService.getMany(pageNo, pageSize, sortDir, sortBy);
+        return getMany(null, pageNo, pageSize, sortDir, sortBy);
     }
 
     @Override
@@ -80,9 +98,11 @@ public class RatingServiceImpl implements RatingService {
             throw new ResourceNotFoundException("Product not found with id: " + productId);
         }
 
-        Pageable pageable = ratingPagingService.createPageable(pageNo, pageSize, sortDir, sortBy);
-        Page<Rating> ratingPage = ratingPagingService.findByProductId(productId, pageable);
-        return ratingPagingService.toPagingResult(ratingPage, ratingPagingService::convertToDto);
+        Specification<Rating> spec = new SpecificationBuilder<Rating>()
+                .addIfNotNull(productId, RatingSpecification::hasProductId)
+                .build();
+
+        return getMany(spec, pageNo, pageSize, sortDir, sortBy);
     }
 
     @Override
@@ -92,9 +112,10 @@ public class RatingServiceImpl implements RatingService {
             throw new ResourceNotFoundException("Customer not found with id: " + customerId);
         }
 
-        Pageable pageable = ratingPagingService.createPageable(pageNo, pageSize, sortDir, sortBy);
-        Page<Rating> ratingPage = ratingPagingService.findByCustomerId(customerId, pageable);
-        return ratingPagingService.toPagingResult(ratingPage, ratingPagingService::convertToDto);
+        Specification<Rating> spec = new SpecificationBuilder<Rating>()
+                .addIfNotNull(customerId, RatingSpecification::hasCustomerId)
+                .build();
+        return getMany(spec, pageNo, pageSize, sortDir, sortBy);
     }
 
     @Override

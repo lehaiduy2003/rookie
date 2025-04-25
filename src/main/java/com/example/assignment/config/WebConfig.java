@@ -1,5 +1,6 @@
 package com.example.assignment.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -22,7 +23,8 @@ import static com.example.assignment.constant.SecurityURL.PUBLIC_URLS;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    private static final String ENVIRONMENT = System.getProperty("spring.profiles.active");
+    @Value("${spring.profiles.active}")
+    private String environment;
     private static final String[] ALLOWED_ORIGINS = {"http://localhost:3000", "http://localhost:5173"};
 
     /**
@@ -35,7 +37,7 @@ public class WebConfig implements WebMvcConfigurer {
         configurer.defaultContentType(org.springframework.http.MediaType.APPLICATION_JSON);
     }
 
-    private static CorsConfigurationSource corsConfigurationSource() {
+    private CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(ALLOWED_ORIGINS));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
@@ -53,7 +55,7 @@ public class WebConfig implements WebMvcConfigurer {
      * @param http the HttpSecurity object to configure
      * @throws Exception if an error occurs during configuration
      */
-    public static void configureCORS(HttpSecurity http) throws Exception {
+    public void configureCORS(HttpSecurity http) throws Exception {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
     }
 
@@ -63,8 +65,8 @@ public class WebConfig implements WebMvcConfigurer {
      * @param http the HttpSecurity object to configure
      * @throws Exception if an error occurs during configuration
      */
-    public static void configureCSRF(HttpSecurity http) throws Exception {
-        if (ENVIRONMENT != null && ENVIRONMENT.equals("development")) {
+    public void configureCSRF(HttpSecurity http) throws Exception {
+        if (environment != null && environment.equals("development")) {
             http.csrf(AbstractHttpConfigurer::disable);
         } else {
             http.csrf(csrf -> csrf.ignoringRequestMatchers(PUBLIC_URLS));

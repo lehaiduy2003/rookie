@@ -1,7 +1,6 @@
 package com.example.assignment.service;
 
-import com.example.assignment.dto.request.ProductCreationReq;
-import com.example.assignment.dto.request.ProductUpdatingReq;
+import com.example.assignment.dto.request.*;
 import com.example.assignment.dto.response.PagingRes;
 import com.example.assignment.dto.response.ProductDetailRes;
 import com.example.assignment.dto.response.ProductRes;
@@ -55,41 +54,6 @@ public interface ProductService {
     ProductRes updateProductCategoryById(Long id, Long categoryId);
 
     /**
-     * Retrieves a product using pagination.
-     *
-     * @param pageNo the page number to retrieve
-     * @param pageSize the number of products per page
-     * @param sortDir the direction to sort (ascending or descending)
-     * @param sortBy the field to sort by
-     * @return the retrieved product
-     */
-    PagingRes<ProductRes> getProducts(Integer pageNo, Integer pageSize, String sortDir, String sortBy);
-
-    /**
-     * Retrieves a product using pagination and filter by category id.
-     *
-     * @param categoryId the id of the category to filter by
-     * @param pageNo the page number to retrieve
-     * @param pageSize the number of products per page
-     * @param sortDir the direction to sort (ascending or descending)
-     * @param sortBy the field to sort by
-     * @return the retrieved product
-     */
-    PagingRes<ProductRes> getProductsByCategoryId(Long categoryId, Integer pageNo, Integer pageSize, String sortDir, String sortBy);
-
-    /**
-     * Retrieves a product using pagination and filter by name.
-     *
-     * @param name the name of the product to filter by
-     * @param pageNo the page number to retrieve
-     * @param pageSize the number of products per page
-     * @param sortDir the direction to sort (ascending or descending)
-     * @param sortBy the field to sort by
-     * @return the retrieved product
-     */
-    PagingRes<ProductRes> getProductsByName(String name, Integer pageNo, Integer pageSize, String sortDir, String sortBy);
-
-    /**
      * Updates the featured status of a product.
      *
      * @param id the id of the product to update
@@ -98,13 +62,19 @@ public interface ProductService {
     void updateToFeaturedProduct(Long id, Boolean isFeatured);
 
     /**
-     * Retrieves a list of featured products using pagination.
-     * @param featured the featured status to filter by
+     * Retrieves a list of products using pagination and filter by name, featured status, and category id.
+     * @param filterReq the filter request object containing filter criteria
      * @param pageNo the page number to retrieve
      * @param pageSize the number of products per page
      * @param sortDir the direction to sort (ascending or descending)
      * @param sortBy the field to sort by
-     * @return the retrieved featured product
+     * @return the retrieved product
      */
-    PagingRes<ProductRes> getFeaturedProducts(boolean featured, Integer pageNo, Integer pageSize, String sortDir, String sortBy);
+    PagingRes<ProductRes> getProducts(
+        ProductFilterReq filterReq,
+        Integer pageNo,
+        Integer pageSize,
+        String sortDir,
+        String sortBy
+    );
 }

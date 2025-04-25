@@ -10,13 +10,12 @@ import com.example.assignment.entity.User;
 import com.example.assignment.entity.UserProfile;
 import com.example.assignment.enums.MemberTier;
 import com.example.assignment.enums.Role;
-import com.example.assignment.exception.ResourceAlreadyExistException;
+import com.example.assignment.exception.ExistingResourceException;
 import com.example.assignment.mapper.UserMapper;
 import com.example.assignment.mapper.UserProfileMapper;
 import com.example.assignment.repository.CustomerRepository;
 import com.example.assignment.repository.UserRepository;
 import com.example.assignment.service.impl.UserServiceImpl;
-import com.example.assignment.service.impl.paging.UserPagingServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -55,9 +54,6 @@ class UserServiceTest {
 
     @Mock
     private UserProfileMapper userProfileMapper;
-
-    @Mock
-    private UserPagingServiceImpl userPagingService;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -189,7 +185,7 @@ class UserServiceTest {
         when(userRepository.existsUserByEmail(anyString())).thenReturn(true);
 
         // Test & Verify
-        assertThrows(ResourceAlreadyExistException.class, () -> userService.createUser(userCreationReq));
+        assertThrows(ExistingResourceException.class, () -> userService.createUser(userCreationReq));
         verify(userRepository).existsUserByEmail("test@example.com");
         verify(userProfileMapper, never()).toEntity(any(UserCreationReq.class));
         verify(userMapper, never()).toCustomer(any(UserCreationReq.class), any(UserProfile.class));
@@ -294,7 +290,7 @@ class UserServiceTest {
                 .empty(false)
                 .build();
 
-        when(userPagingService.getMany(anyInt(), anyInt(), anyString(), anyString())).thenReturn(pagingRes);
+        when(userService.getMany(null, anyInt(), anyInt(), anyString(), anyString())).thenReturn(pagingRes);
 
         // Test
         PagingRes<UserRes> result = userService.getUsers(0, 10, "asc", "id");
@@ -302,7 +298,7 @@ class UserServiceTest {
         // Verify
         assertNotNull(result);
         assertEquals(pagingRes, result);
-        verify(userPagingService).getMany(0, 10, "asc", "id");
+        verify(userService).getMany(null,0, 10, "asc", "id");
     }
 
     @Test

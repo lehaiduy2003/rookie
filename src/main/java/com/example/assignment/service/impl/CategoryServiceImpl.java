@@ -22,6 +22,16 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryMapper categoryMapper;
 
     @Override
+    public List<CategoryRes> getTopLevelCategories() {
+        // Fetch root categories (categories with no parent)
+        List<Category> rootCategories = categoryRepository.findCategoriesByParentIsNull();
+        return rootCategories.stream()
+            // Map each root category to CategoryRes
+            .map(categoryMapper::toDtoRes)
+            .toList();
+    }
+
+    @Override
     @Transactional
     public CategoryRes createCategory(CategoryCreationReq categoryCreationReq) {
         Long parentId = categoryCreationReq.getParentId();

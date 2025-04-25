@@ -2,34 +2,50 @@ package com.example.assignment.service.impl;
 
 import com.example.assignment.annotation.Logging;
 import com.example.assignment.dto.request.ProductCreationReq;
+import com.example.assignment.dto.request.ProductFilterReq;
 import com.example.assignment.dto.request.ProductUpdatingReq;
 import com.example.assignment.dto.response.PagingRes;
 import com.example.assignment.dto.response.ProductDetailRes;
 import com.example.assignment.dto.response.ProductRes;
 import com.example.assignment.entity.Category;
 import com.example.assignment.entity.Product;
-import com.example.assignment.entity.User;
-import com.example.assignment.enums.Role;
 import com.example.assignment.mapper.ProductMapper;
+import com.example.assignment.repository.BaseRepository;
 import com.example.assignment.repository.CategoryRepository;
 import com.example.assignment.repository.ProductRepository;
 import com.example.assignment.service.ProductService;
-import com.example.assignment.service.impl.paging.ProductPagingServiceImpl;
+import com.example.assignment.specification.ProductSpecification;
+import com.example.assignment.util.SpecificationBuilder;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
 @Logging
-public class ProductServiceImpl implements ProductService {
+public class ProductServiceImpl extends PagingServiceImpl<ProductRes, Product, Long> implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final ProductMapper productMapper;
-    private final ProductPagingServiceImpl productPagingService;
 
+    @Override
+    protected BaseRepository<Product, Long> getRepository() {
+        return productRepository;
+    }
+
+    @Override
+    protected ProductRes convertToDto(Product entity) {
+        return productMapper.toDto(entity);
+    }
+
+    @Override
+    protected PagingRes<ProductRes> toPagingResult(Page<Product> page, Function<Product, ProductRes> converter) {
+        return productMapper.toPagingResult(page, converter);
+    }
 
     @Override
     @Transactional
@@ -68,9 +84,6 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
-        // Check if a user is authorized to update this product
-        checkUpdatePermission(product);
-
         updateProductDetails(product, productUpdatingReq);
 
         // Validate product before saving
@@ -78,31 +91,6 @@ public class ProductServiceImpl implements ProductService {
 
         Product updatedProduct = productRepository.save(product);
         return productMapper.toDto(updatedProduct);
-    }
-
-    /**
-     * Checks if the current user has permission to update the product.
-     * Admins can update any product, while customers can only update products they created.
-     *
-     * @param product the product to check permissions for
-     * @throws org.springframework.security.access.AccessDeniedException if the user doesn't have permission
-     */
-    private void checkUpdatePermission(Product product) {
-        // Get a current authenticated user
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!(principal instanceof User currentUser)) {
-            throw new AccessDeniedException("Authentication required");
-        }
-
-        // Admins can update any product
-        if (currentUser.getRole() == Role.ADMIN) {
-            return;
-        }
-
-        // Customers can only update products they created
-        if (product.getCreatedBy() == null || !product.getCreatedBy().equals(currentUser)) {
-            throw new AccessDeniedException("You can only update products you created");
-        }
     }
 
     @Override
@@ -138,47 +126,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public PagingRes<ProductRes> getProducts(Integer pageNo, Integer pageSize, String sortDir, String sortBy) {
-        try {
-            return productPagingService.getMany(pageNo, pageSize, sortDir, sortBy);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("No products found");
-        }
-    }
-
-    @Override
-    public PagingRes<ProductRes> getProductsByCategoryId(Long categoryId, Integer pageNo, Integer pageSize, String sortDir, String sortBy) {
-        try {
-            return productPagingService.getById(categoryId, pageNo, pageSize, sortDir, sortBy);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("No products found");
-        }
-    }
-
-    @Override
-    public PagingRes<ProductRes> getProductsByName(String name, Integer pageNo, Integer pageSize, String sortDir, String sortBy) {
-        try {
-            return productPagingService.getByCriteria(name, pageNo, pageSize, sortDir, sortBy);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("No products found");
-        }
-    }
-
-    @Override
     @Transactional
     public void updateToFeaturedProduct(Long id, Boolean isFeatured) {
         Product product = productRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Product not found"));
-
-        // Only admin can update the featured attribute
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!(principal instanceof User currentUser)) {
-            throw new AccessDeniedException("Authentication required");
-        }
-
-        if (currentUser.getRole() != Role.ADMIN) {
-            throw new AccessDeniedException("Only administrators can update featured status");
-        }
 
         product.setFeatured(isFeatured);
 
@@ -189,9 +140,17 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public PagingRes<ProductRes> getFeaturedProducts(boolean featured, Integer pageNo, Integer pageSize, String sortDir, String sortBy) {
+    public PagingRes<ProductRes> getProducts(ProductFilterReq filterReq, Integer pageNo, Integer pageSize, String sortDir, String sortBy) {
         try {
-            return productPagingService.getFeaturedProducts(featured, pageNo, pageSize, sortDir, sortBy);
+            Specification<Product> spec = new SpecificationBuilder<Product>()
+                .addIfNotNull(filterReq.getName(), ProductSpecification::hasName)
+                .addIfNotNull(filterReq.getIsActive(), ProductSpecification::hasIsActive)
+                .addIfNotNull(filterReq.getFeatured(), ProductSpecification::isFeatured)
+                .addIfNotNull(filterReq.getCategoryId(), ProductSpecification::hasCategoryId)
+                .add(ProductSpecification.hasPriceBetween(filterReq.getMinPrice(), filterReq.getMaxPrice()))
+                .add(ProductSpecification.hasRatingBetween(filterReq.getMinRating(), filterReq.getMaxRating()))
+                .build();
+            return getMany(spec, pageNo, pageSize, sortDir, sortBy);
         } catch (Exception e) {
             throw new IllegalArgumentException("No products found");
         }

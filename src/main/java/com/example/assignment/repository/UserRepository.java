@@ -2,14 +2,13 @@ package com.example.assignment.repository;
 
 import com.example.assignment.entity.User;
 import jakarta.validation.constraints.Email;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * Repository interface for managing User entities.
  * It extends JpaRepository to provide CRUD operations.
  * Contains some custom methods.
  */
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends BaseRepository<User, Long> {
     /**
      * Finds a user by their email address.
      *

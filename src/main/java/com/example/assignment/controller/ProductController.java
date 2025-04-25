@@ -1,17 +1,20 @@
 package com.example.assignment.controller;
 
-import com.example.assignment.dto.request.ProductCreationReq;
-import com.example.assignment.dto.request.ProductUpdatingReq;
+import com.example.assignment.dto.request.*;
 import com.example.assignment.dto.response.PagingRes;
 import com.example.assignment.dto.response.ProductDetailRes;
 import com.example.assignment.dto.response.ProductRes;
 import com.example.assignment.service.ProductService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
+@Validated
 @RequestMapping("/api/v1/products")
 public class ProductController {
     private final ProductService productService;
@@ -28,17 +31,14 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<PagingRes<ProductRes>> getProducts(
-        @RequestParam(defaultValue = "false") Boolean featured,
+        @Valid @ModelAttribute ProductFilterReq filter,
         @RequestParam(defaultValue = "0") Integer pageNo,
         @RequestParam(defaultValue = "10") Integer pageSize,
         @RequestParam(defaultValue = "id") String sortBy,
         @RequestParam(defaultValue = "asc") String sortDir
     ) {
-        if(Boolean.TRUE.equals(featured)) {
-            PagingRes<ProductRes> featuredProducts = getFeaturedProducts(pageNo, pageSize, sortBy, sortDir);
-            return ResponseEntity.ok(featuredProducts);
-        }
-        PagingRes<ProductRes> products = productService.getProducts(pageNo, pageSize, sortDir, sortBy);
+        log.info("Get products by filter: {}", filter);
+        PagingRes<ProductRes> products = productService.getProducts(filter, pageNo, pageSize, sortDir, sortBy);
         return ResponseEntity.ok(products);
     }
 
@@ -71,43 +71,11 @@ public class ProductController {
         return ResponseEntity.ok(updatedProduct);
     }
 
-    @GetMapping("/category/{categoryId}")
-    public ResponseEntity<PagingRes<ProductRes>> getProductsByCategoryId(
-        @PathVariable Long categoryId,
-        @RequestParam(defaultValue = "0") Integer pageNo,
-        @RequestParam(defaultValue = "10") Integer pageSize,
-        @RequestParam(defaultValue = "id") String sortBy,
-        @RequestParam(defaultValue = "asc") String sortDir
-    ) {
-        PagingRes<ProductRes> products = productService.getProductsByCategoryId(categoryId, pageNo, pageSize, sortDir, sortBy);
-        return ResponseEntity.ok(products);
-    }
-
-    @GetMapping("search")
-    public ResponseEntity<PagingRes<ProductRes>> searchProducts(
-        @RequestParam String name,
-        @RequestParam(defaultValue = "0") Integer pageNo,
-        @RequestParam(defaultValue = "10") Integer pageSize,
-        @RequestParam(defaultValue = "id") String sortBy,
-        @RequestParam(defaultValue = "asc") String sortDir
-    ) {
-        PagingRes<ProductRes> products = productService.getProductsByName(name, pageNo, pageSize, sortDir, sortBy);
-        return ResponseEntity.ok(products);
-    }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{id}")
     public ResponseEntity<Void> updateFeaturedProduct(@PathVariable Long id, @RequestParam(defaultValue = "false") Boolean featured) {
         productService.updateToFeaturedProduct(id, featured);
         return ResponseEntity.noContent().build();
-    }
-
-    private PagingRes<ProductRes> getFeaturedProducts(
-        Integer pageNo,
-        Integer pageSize,
-        String sortBy,
-        String sortDir
-    ) {
-        return productService.getFeaturedProducts(true, pageNo, pageSize, sortDir, sortBy);
     }
 }
