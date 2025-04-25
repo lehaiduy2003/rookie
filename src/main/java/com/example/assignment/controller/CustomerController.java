@@ -18,13 +18,15 @@ public class CustomerController {
 
     @GetMapping
     public ResponseEntity<PagingRes<UserRes>> getPageableCustomers(
+        @RequestParam(required = false) String name,
+        @RequestParam(required = false) String memberTier,
         @RequestParam(defaultValue = "0") Integer pageNo,
         @RequestParam(defaultValue = "10") Integer pageSize,
         @RequestParam(defaultValue = "asc") String sortDir,
         @RequestParam(defaultValue = "id") String sortBy
         ) {
         try {
-            PagingRes<UserRes> customers = customerService.getCustomers(pageNo, pageSize, sortDir, sortBy);
+            PagingRes<UserRes> customers = customerService.getCustomers(name, memberTier, pageNo, pageSize, sortDir, sortBy);
             return ResponseEntity.ok(customers);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();

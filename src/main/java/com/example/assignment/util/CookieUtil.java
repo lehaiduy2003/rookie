@@ -16,12 +16,13 @@ public class CookieUtil {
     @Value("${jwt.refresh-token.expiration}")
     private long refreshTokenExpiration;
 
-    private static final String ENVIRONMENT = System.getProperty("spring.profiles.active");
+    @Value("${spring.profiles.active}")
+    private String environment;
 
     private static final String REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
 
     private boolean isSecure() {
-        return ENVIRONMENT != null && ENVIRONMENT.equals("production");
+        return environment != null && environment.equals("production");
     }
 
     /**

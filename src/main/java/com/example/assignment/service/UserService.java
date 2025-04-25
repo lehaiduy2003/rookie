@@ -56,4 +56,12 @@ public interface UserService extends UserDetailsService {
      * @return the retrieved paging result of users
      */
     PagingRes<UserRes> getUsers(Integer pageNo, Integer pageSize, String sortDir, String sortBy);
+
+    /**
+     * Checks if a user exists by email.
+     *
+     * @param email the email of the user to check
+     * @return true if the user exists, false otherwise
+     */
+    boolean existsByEmail(String email);
 }

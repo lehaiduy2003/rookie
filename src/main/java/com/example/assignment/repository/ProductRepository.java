@@ -2,38 +2,18 @@ package com.example.assignment.repository;
 
 import com.example.assignment.entity.Product;
 import lombok.NonNull;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 /**
  * Repository interface for managing Product entities.
  * This interface extends JpaRepository to provide CRUD operations.
+ * It also extends JpaSpecificationExecutor to support dynamic queries.
  * It includes methods for finding products by category ID and name.
  * FindById method is overridden to include category information in the result.
  */
-public interface ProductRepository extends JpaRepository<Product, Long> {
-    /**
-     * Finds a page of products by category ID.
-     * @param categoryId the ID of the category to filter products by
-     * @param pageable the pagination information
-     * @return a page of products belonging to the specified category
-     */
-    Page<Product> findByCategory_Id(Long categoryId, Pageable pageable);
-
-    /**
-     * Finds a page of products by name, ignoreCase.
-     * @param name the name to search for
-     * @param pageable the pagination information
-     * @return a page of products whose names contain the specified string, ignoring case
-     */
-    Page<Product> findByNameContainingIgnoreCase(String name, Pageable pageable);
-
+public interface ProductRepository extends BaseRepository<Product, Long> {
     /**
      * Finds a page of products by name and category ID.
      * Overrides the default method to include category information in the result.
@@ -61,12 +41,4 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
   WHERE id = :productId
 """, nativeQuery = true)
     void updateProductRating(@Param("productId") Long productId, @Param("score") double score);
-
-    /**
-     * Finds a page of products that are featured.
-     * @param featured the featured status to filter products by
-     * @param pageable the pagination information
-     * @return a page of products that are featured
-     */
-    Page<Product> findByFeatured(boolean featured, Pageable pageable);
 }
