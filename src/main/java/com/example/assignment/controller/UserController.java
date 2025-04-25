@@ -4,7 +4,7 @@ import com.example.assignment.dto.response.PagingRes;
 import com.example.assignment.dto.response.UserDetailsRes;
 import com.example.assignment.dto.response.UserRes;
 import com.example.assignment.entity.User;
-import com.example.assignment.exception.ResourceAlreadyExistException;
+import com.example.assignment.exception.ExistingResourceException;
 import com.example.assignment.service.UserService;
 import com.example.assignment.dto.request.UserCreationReq;
 import com.example.assignment.dto.request.UserInfoUpdatingReq;
@@ -32,7 +32,7 @@ public class UserController {
         try {
             UserDetailsRes createdUser = userService.createUser(userCreationReq);
             return ResponseEntity.status(201).body(createdUser);
-        } catch (ResourceAlreadyExistException e) {
+        } catch (ExistingResourceException e) {
             return ResponseEntity.status(409).build(); // Conflict
         } catch (AccessDeniedException e) {
             return ResponseEntity.status(403).build(); // Forbidden
@@ -78,7 +78,7 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<PagingRes<UserRes>> getPageableUsers(
+    public ResponseEntity<PagingRes<UserRes>> getUsers(
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy,
