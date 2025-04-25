@@ -2,19 +2,19 @@ package com.example.assignment.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 
 /**
  * Security configuration class to set up authentication and password encoding.
  * This class configures the authentication manager and password encoder for the application.
  * It also provides a DaoAuthenticationProvider for user authentication.
  */
-@Component
+@Configuration
 @RequiredArgsConstructor
 public class AuthConfig {
 
