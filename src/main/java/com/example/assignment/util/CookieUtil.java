@@ -16,10 +16,13 @@ public class CookieUtil {
     @Value("${jwt.refresh-token.expiration}")
     private long refreshTokenExpiration;
 
-    @Value("${spring.profiles.active}")
-    private String environment;
 
     private static final String REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
+
+    private static final String PATH = "/api/v1/auth/refresh";
+
+    @Value("${spring.profiles.active}") // development
+    private String environment;
 
     private boolean isSecure() {
         return environment != null && environment.equals("production");
@@ -35,7 +38,7 @@ public class CookieUtil {
         Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE_NAME, refreshToken);
         cookie.setHttpOnly(true);
         cookie.setSecure(isSecure()); // Set secure flag based on environment
-        cookie.setPath("/api/v1/auth/refresh"); // Only accessible by auth endpoints
+        cookie.setPath(PATH); // Only accessible by auth endpoints
         cookie.setMaxAge((int) (refreshTokenExpiration / 1000)); // Convert milliseconds to seconds
         response.addCookie(cookie);
     }
@@ -49,7 +52,7 @@ public class CookieUtil {
         Cookie cookie = new Cookie(REFRESH_TOKEN_COOKIE_NAME, null);
         cookie.setHttpOnly(true);
         cookie.setSecure(isSecure());
-        cookie.setPath("/api/v1/auth/refresh");
+        cookie.setPath(PATH);
         cookie.setMaxAge(0); // Delete cookie
         response.addCookie(cookie);
     }
