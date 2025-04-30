@@ -1,9 +1,10 @@
 package com.example.assignment.dto.response;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
-@Data
-@Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserRes {
     private Long id;
     private String firstName;
@@ -11,5 +12,5 @@ public class UserRes {
     private String avatar;
     private String role;
     private String memberTier;
-    private boolean isActive;
+    private Boolean isActive;
 }
