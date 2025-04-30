@@ -9,7 +9,7 @@ import com.example.assignment.mapper.UserMapper;
 import com.example.assignment.repository.BaseRepository;
 import com.example.assignment.repository.CustomerRepository;
 import com.example.assignment.service.CustomerService;
-import com.example.assignment.specification.CustomerSpecification;
+import com.example.assignment.specification.UserSpecification;
 import com.example.assignment.util.SpecificationBuilder;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -61,7 +61,7 @@ public class CustomerServiceImpl extends PagingServiceImpl<UserRes, Customer, Lo
             MemberTier tier = MemberTier.valueOf(memberTier.toUpperCase());
             // Create a specification to filter customers by member tier
             Specification<Customer> spec = new SpecificationBuilder<Customer>()
-                .addIfNotNull(tier, CustomerSpecification::hasMemberTier)
+                .addIfNotNull(tier, UserSpecification::hasMemberTier)
                 .build();
             return getMany(spec, pageNo, pageSize, sortDir, sortBy);
         } catch (Exception e) {
