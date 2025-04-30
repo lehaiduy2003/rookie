@@ -5,12 +5,13 @@ import com.example.assignment.dto.request.RegisterReq;
 import com.example.assignment.dto.response.AuthRes;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
  * Service interface for handling authentication operations.
  * This interface defines methods for user registration, login, logout, and token refresh.
  */
-public interface AuthService {
+public interface AuthService extends UserDetailsService {
 
     /**
      * Registers a new user.

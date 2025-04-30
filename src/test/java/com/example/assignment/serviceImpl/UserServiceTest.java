@@ -15,6 +15,7 @@ import com.example.assignment.mapper.UserMapper;
 import com.example.assignment.mapper.UserProfileMapper;
 import com.example.assignment.repository.CustomerRepository;
 import com.example.assignment.repository.UserRepository;
+import com.example.assignment.service.impl.AuthServiceImpl;
 import com.example.assignment.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -57,6 +58,9 @@ class UserServiceTest {
 
     @InjectMocks
     private UserServiceImpl userService;
+
+    @InjectMocks
+    private AuthServiceImpl authService;
 
     private UserCreationReq userCreationReq;
     private UserInfoUpdatingReq userInfoUpdatingReq;
@@ -110,13 +114,7 @@ class UserServiceTest {
         customer.setUserProfile(userProfile);
         userProfile.setUser(customer);
 
-        userRes = UserRes.builder()
-                .id(1L)
-                .firstName("Test")
-                .lastName("User")
-                .role("CUSTOMER")
-                .memberTier("COMMON")
-                .build();
+        userRes = new UserRes(1L, "Test", "User", "avatar.jpg", "CUSTOMER", "COMMON", true);
 
         userDetailsRes = UserDetailsRes.builder()
                 .id(1L)
@@ -136,7 +134,7 @@ class UserServiceTest {
         when(userRepository.findByEmail(anyString())).thenReturn(user);
 
         // Test
-        User result = (User) userService.loadUserByUsername("test@example.com");
+        User result = (User) authService.loadUserByUsername("test@example.com");
 
         // Verify
         assertNotNull(result);
@@ -151,7 +149,7 @@ class UserServiceTest {
         when(userRepository.findByEmail(anyString())).thenReturn(null);
 
         // Test & Verify
-        assertThrows(UsernameNotFoundException.class, () -> userService.loadUserByUsername("nonexistent@example.com"));
+        assertThrows(UsernameNotFoundException.class, () -> authService.loadUserByUsername("nonexistent@example.com"));
         verify(userRepository).findByEmail("nonexistent@example.com");
     }
 
@@ -279,9 +277,9 @@ class UserServiceTest {
     @DisplayName("Test getUsers returns paginated users successfully")
     void testGetUsersReturnsPaginatedUsersSuccessfully() {
         // Setup
-        List<UserRes> userList = new ArrayList<>();
-        userList.add(userRes);
-        PagingRes<UserRes> pagingRes = PagingRes.<UserRes>builder()
+        List<UserDetailsRes> userList = new ArrayList<>();
+        userList.add(userDetailsRes);
+        PagingRes<UserDetailsRes> pagingRes = PagingRes.<UserDetailsRes>builder()
                 .content(userList)
                 .totalElements(1)
                 .totalPages(1)
@@ -293,7 +291,7 @@ class UserServiceTest {
         when(userService.getMany(null, anyInt(), anyInt(), anyString(), anyString())).thenReturn(pagingRes);
 
         // Test
-        PagingRes<UserRes> result = userService.getUsers(0, 10, "asc", "id");
+        PagingRes<UserDetailsRes> result = userService.getUsers(null,0, 10, "asc", "id");
 
         // Verify
         assertNotNull(result);
