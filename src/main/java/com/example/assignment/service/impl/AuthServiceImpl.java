@@ -24,6 +24,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +38,15 @@ public class AuthServiceImpl implements AuthService {
     private final JwtProvider jwtProvider;
     private final CookieUtil cookieUtil;
     private final PasswordUtil passwordUtil;
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userService.findByEmail(email);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found with email: " + email);
+        }
+        return user;
+    }
 
     @Override
     @Transactional
@@ -59,7 +70,7 @@ public class AuthServiceImpl implements AuthService {
         userService.createUser(userCreationReq);
 
         // Load user details for token generation
-        User user = (User) userService.loadUserByUsername(registerReq.getEmail());
+        User user = (User) loadUserByUsername(registerReq.getEmail());
 
         // Generate tokens
         String accessToken = jwtProvider.generateAccessToken(user);
@@ -81,7 +92,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthRes login(LoginReq loginReq, HttpServletRequest request, HttpServletResponse response) {
         // Load user from database
-        User user = (User) userService.loadUserByUsername(loginReq.getEmail());
+        User user = (User) loadUserByUsername(loginReq.getEmail());
 
         // Check if a user exists
         if (user == null) {
@@ -136,7 +147,7 @@ public class AuthServiceImpl implements AuthService {
                 throw new UnAuthorizedException("Invalid refresh token");
             }
             // Load user details
-            User user = (User) userService.loadUserByUsername(username);
+            User user = (User) loadUserByUsername(username);
 
             // Validate refresh token
             if (!Boolean.TRUE.equals(jwtProvider.validateToken(refreshToken))) {

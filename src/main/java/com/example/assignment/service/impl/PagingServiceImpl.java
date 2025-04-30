@@ -45,7 +45,15 @@ public abstract class PagingServiceImpl<T, E, K extends Serializable> implements
     protected abstract PagingRes<T> toPagingResult(Page<E> page, Function<E, T> converter);
 
 
-    private Pageable createPageable(Integer pageNo, Integer pageSize, String sortDir, String sortBy) {
+    /**
+     * * Create a pageable object for pagination and sorting.
+     * @param pageNo the page number to retrieve
+     * @param pageSize the number of items per page
+     * @param sortDir the direction to sort (ascending or descending)
+     * @param sortBy the field to sort by
+     * @return a pageable object for pagination and sorting
+     */
+    protected Pageable createPageable(Integer pageNo, Integer pageSize, String sortDir, String sortBy) {
         // Validate and set default values for pagination and sorting parameters
         // Shouldn't throw exception, just set default values
         if (pageNo < 0) {

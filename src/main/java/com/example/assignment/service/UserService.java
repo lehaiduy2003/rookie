@@ -1,10 +1,11 @@
 package com.example.assignment.service;
-import com.example.assignment.dto.request.UserCreationReq;
-import com.example.assignment.dto.request.UserInfoUpdatingReq;
+import com.example.assignment.dto.request.*;
 import com.example.assignment.dto.response.PagingRes;
 import com.example.assignment.dto.response.UserDetailsRes;
-import com.example.assignment.dto.response.UserRes;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import com.example.assignment.entity.User;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+import java.util.List;
 
 
 /**
@@ -12,7 +13,18 @@ import org.springframework.security.core.userdetails.UserDetailsService;
  * Extends UserDetailsService to provide user details for authentication.
  * This interface defines methods for creating, updating, and deleting users.
  */
-public interface UserService extends UserDetailsService {
+public interface UserService {
+
+    /**
+     * Find a user by email.
+     * This method retrieves a user by their email address.
+     * It uses for Spring Security to load user-specific data for authentication.
+     * This method is used by {@link AuthService}
+     * @param email The email of the user to retrieve
+     * @return The User entity
+     * @throws UsernameNotFoundException if the user is not found
+     */
+    User findByEmail(String email);
 
     /**
      * Creates a new user with UserCreationReq.
@@ -31,6 +43,19 @@ public interface UserService extends UserDetailsService {
      */
     UserDetailsRes updateUserById(Long id, UserInfoUpdatingReq userInfoUpdatingReq);
 
+
+    /**
+     * Updates an existing user.
+     * This method is used for updating user information by admin.
+     *
+     * @param id the id of the user to update
+     * @param userUpdatingReq the request object containing user update details
+     * @return the updated user
+     */
+    UserDetailsRes updateUserById(Long id, UserUpdatingReq userUpdatingReq);
+
+
+
     /**
      * Retrieves a user by id.
      *
@@ -48,14 +73,14 @@ public interface UserService extends UserDetailsService {
 
     /**
      * Retrieves a user using pagination.
-     *
+     * @param filter the filter criteria for retrieving users
      * @param pageNo the page number to retrieve
      * @param pageSize the number of users per page
      * @param sortDir the direction to sort (ascending or descending)
      * @param sortBy the field to sort by
      * @return the retrieved paging result of users
      */
-    PagingRes<UserRes> getUsers(Integer pageNo, Integer pageSize, String sortDir, String sortBy);
+    PagingRes<UserDetailsRes> getUsers(UserFilterReq filter, Integer pageNo, Integer pageSize, String sortDir, String sortBy);
 
     /**
      * Checks if a user exists by email.
@@ -64,4 +89,10 @@ public interface UserService extends UserDetailsService {
      * @return true if the user exists, false otherwise
      */
     boolean existsByEmail(String email);
+
+    /**
+     * Bulk deletes a list of customers.
+     * @param ids the list of customer IDs to delete
+     */
+    void bulkDeleteCustomers(List<Long> ids);
 }

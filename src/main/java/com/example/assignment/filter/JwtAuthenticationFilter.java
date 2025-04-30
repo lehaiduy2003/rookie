@@ -2,7 +2,7 @@ package com.example.assignment.filter;
 
 import com.example.assignment.entity.User;
 import com.example.assignment.provider.JwtProvider;
-import com.example.assignment.service.UserService;
+import com.example.assignment.service.AuthService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,7 +24,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
-    private final UserService userService;
+    private final AuthService authService;
 
     @Override
     protected void doFilterInternal(
@@ -50,7 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // Check if the username is not null and authentication is not yet set
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 // Load user details from database
-                User user = (User) this.userService.loadUserByUsername(userEmail);
+                User user = (User) this.authService.loadUserByUsername(userEmail);
 
                 // check if this token's owner is the same as the one in the database
                 if(!userEmail.equals(user.getEmail())) {

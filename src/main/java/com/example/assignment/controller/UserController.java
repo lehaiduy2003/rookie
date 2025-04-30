@@ -1,13 +1,11 @@
 package com.example.assignment.controller;
 
+import com.example.assignment.dto.request.*;
 import com.example.assignment.dto.response.PagingRes;
 import com.example.assignment.dto.response.UserDetailsRes;
-import com.example.assignment.dto.response.UserRes;
 import com.example.assignment.entity.User;
 import com.example.assignment.exception.ExistingResourceException;
 import com.example.assignment.service.UserService;
-import com.example.assignment.dto.request.UserCreationReq;
-import com.example.assignment.dto.request.UserInfoUpdatingReq;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -21,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/users")
 public class UserController {
     private final UserService userService;
+
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -42,12 +41,12 @@ public class UserController {
     }
 
 
-    @PreAuthorize("hasRole('ADMIN') or (hasRole('CUSTOMER') and principal.id == #id)")
+    @PreAuthorize("hasRole('CUSTOMER') and principal.id == #id")
     @PutMapping("/{id}")
     public ResponseEntity<UserDetailsRes> updateUser(
         @PathVariable Long id,
         @Valid @RequestBody UserInfoUpdatingReq userInfoUpdatingReq,
-        @AuthenticationPrincipal @SuppressWarnings("unused") User principal // to get the authenticated user for authorization on @PreAuthorize
+        @AuthenticationPrincipal @SuppressWarnings("Use for validate owner resources") User principal // to get the authenticated user for authorization on @PreAuthorize
     ) {
         try {
             UserDetailsRes updatedUser = userService.updateUserById(id, userInfoUpdatingReq);
@@ -60,6 +59,20 @@ public class UserController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}/by-admin")
+    public ResponseEntity<UserDetailsRes> updateUserByAdmin(
+        @PathVariable Long id,
+        @Valid @RequestBody UserUpdatingReq userUpdatingReq,
+        @AuthenticationPrincipal @SuppressWarnings("Use for validate owner resources") User principal // to get the authenticated user for authorization on @PreAuthorize
+    ) {
+
+        UserDetailsRes updatedUser = userService.updateUserById(id, userUpdatingReq);
+        return ResponseEntity.ok(updatedUser);
+    }
+
+
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
@@ -78,14 +91,15 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<PagingRes<UserRes>> getUsers(
+    public ResponseEntity<PagingRes<UserDetailsRes>> getUsers(
+        @Valid @ModelAttribute UserFilterReq filter,
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir
     ) {
         try {
-            PagingRes<UserRes> users = userService.getUsers(pageNo, pageSize, sortDir, sortBy);
+            PagingRes<UserDetailsRes> users = userService.getUsers(filter, pageNo, pageSize, sortDir, sortBy);
             return ResponseEntity.ok(users);
         } catch (UsernameNotFoundException e) {
             return ResponseEntity.status(404).build(); // Not Found
@@ -106,5 +120,12 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/bulk")
+    public ResponseEntity<Void> bulkDelete(@RequestBody @Valid BulkActionReq<Long> request) {
+        userService.bulkDeleteCustomers(request.getItems());
+        return ResponseEntity.noContent().build();
     }
 }

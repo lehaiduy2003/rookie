@@ -1,30 +1,32 @@
 package com.example.assignment.service.impl;
 
 import com.example.assignment.annotation.Logging;
+import com.example.assignment.dto.request.*;
 import com.example.assignment.dto.response.PagingRes;
 import com.example.assignment.dto.response.UserDetailsRes;
-import com.example.assignment.dto.response.UserRes;
 import com.example.assignment.entity.Customer;
 import com.example.assignment.exception.ExistingResourceException;
 import com.example.assignment.repository.BaseRepository;
 import com.example.assignment.repository.CustomerRepository;
 import com.example.assignment.repository.UserRepository;
 import com.example.assignment.service.UserService;
-import com.example.assignment.dto.request.UserCreationReq;
-import com.example.assignment.dto.request.UserInfoUpdatingReq;
 import com.example.assignment.entity.User;
 import com.example.assignment.entity.UserProfile;
 import com.example.assignment.mapper.UserMapper;
 import com.example.assignment.mapper.UserProfileMapper;
+import com.example.assignment.specification.UserSpecification;
+import com.example.assignment.util.PasswordUtil;
+import com.example.assignment.util.SpecificationBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -37,12 +39,12 @@ import java.util.function.Function;
 @Service
 @RequiredArgsConstructor
 @Logging
-public class UserServiceImpl extends PagingServiceImpl<UserRes, User, Long> implements UserService {
+public class UserServiceImpl extends PagingServiceImpl<UserDetailsRes, User, Long> implements UserService {
     private final UserRepository userRepository;
     private final CustomerRepository customerRepository;
     private final UserMapper userMapper;
     private final UserProfileMapper userProfileMapper;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordUtil passwordUtil;
 
     @Override
     protected BaseRepository<User, Long> getRepository() {
@@ -50,22 +52,18 @@ public class UserServiceImpl extends PagingServiceImpl<UserRes, User, Long> impl
     }
 
     @Override
-    protected UserRes convertToDto(User entity) {
-        return userMapper.toDto(entity);
+    protected UserDetailsRes convertToDto(User entity) {
+        return userMapper.toUserDetailsDto(entity);
     }
 
     @Override
-    protected PagingRes<UserRes> toPagingResult(Page<User> page, Function<User, UserRes> converter) {
+    protected PagingRes<UserDetailsRes> toPagingResult(Page<User> page, Function<User, UserDetailsRes> converter) {
         return userMapper.toPagingResult(page, converter);
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email);
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found with email: " + email);
-        }
-        return user;
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     @Override
@@ -77,8 +75,8 @@ public class UserServiceImpl extends PagingServiceImpl<UserRes, User, Long> impl
         }
         UserProfile userProfile = userProfileMapper.toEntity(userCreationReq);
         Customer user = userMapper.toCustomer(userCreationReq, userProfile);
-        String encodedPassword = passwordEncoder.encode(userCreationReq.getPassword());
-        user.setPassword(encodedPassword);// Assuming password is already encoded
+        String encodedPassword = passwordUtil.encode(userCreationReq.getPassword());
+        user.setPassword(encodedPassword);
         user.setUserProfile(userProfile);
         userProfile.setUser(user);
         customerRepository.save(user);
@@ -89,13 +87,7 @@ public class UserServiceImpl extends PagingServiceImpl<UserRes, User, Long> impl
     @Transactional
     public UserDetailsRes updateUserById(Long id, UserInfoUpdatingReq userInfoUpdatingReq) {
         User user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        UserProfile existingUserProfile = user.getUserProfile();
-        existingUserProfile.setFirstName(userInfoUpdatingReq.getFirstName());
-        existingUserProfile.setLastName(userInfoUpdatingReq.getLastName());
-        existingUserProfile.setAddress(userInfoUpdatingReq.getAddress());
-        existingUserProfile.setBio(userInfoUpdatingReq.getBio());
-        existingUserProfile.setAvatar(userInfoUpdatingReq.getAvatar());
-        user.setUserProfile(existingUserProfile);
+        updateUserProfile(user, userInfoUpdatingReq);
         User updatedUser = userRepository.save(user);
         return userMapper.toUserDetailsDto(updatedUser);
     }
@@ -114,12 +106,25 @@ public class UserServiceImpl extends PagingServiceImpl<UserRes, User, Long> impl
     }
 
     @Override
-    public PagingRes<UserRes> getUsers(Integer pageNo, Integer pageSize, String sortDir, String sortBy) {
+    public PagingRes<UserDetailsRes> getUsers(UserFilterReq filter, Integer pageNo, Integer pageSize, String sortDir, String sortBy) {
         try {
-            return getMany(null, pageNo, pageSize, sortDir, sortBy);
+            Specification<Customer> customerSpec = new SpecificationBuilder<Customer>()
+                .addIfNotNull(filter.getFirstName(), UserSpecification::hasFirstName)
+                .addIfNotNull(filter.getLastName(), UserSpecification::hasLastName)
+                .addIfNotNull(filter.getEmail(), UserSpecification::hasEmail)
+                .addIfNotNull(filter.getIsActive(), UserSpecification::hasActiveStatus)
+                .addIfNotNull(filter.getMemberTier(), UserSpecification::hasMemberTier)
+                .addIfNotNull(filter.getRole(), UserSpecification::hasRole)
+                .addIfNotNull(filter.getCreatedOn(), UserSpecification::hasCreatedOn)
+                .addIfNotNull(filter.getUpdatedOn(), UserSpecification::hasUpdatedOn)
+                .build();
+            // Cast to Specification<User> using an intermediate wildcard type
+            @SuppressWarnings("unchecked")
+            Specification<User> userSpec = (Specification<User>)(Specification<?>) customerSpec;
+            return getMany(userSpec, pageNo, pageSize, sortDir, sortBy);
         } catch (Exception e) {
             // More appropriate to return an empty result than throw an exception
-            return PagingRes.<UserRes>builder()
+            return PagingRes.<UserDetailsRes>builder()
                     .content(new ArrayList<>())
                     .totalElements(0)
                     .totalPages(0)
@@ -139,5 +144,94 @@ public class UserServiceImpl extends PagingServiceImpl<UserRes, User, Long> impl
     @Override
     public boolean existsByEmail(String email) {
         return userRepository.existsUserByEmail(email);
+    }
+
+    @Override
+    @Transactional
+    public void bulkDeleteCustomers(List<Long> ids) {
+        List<Customer> customers = customerRepository.findAllById(ids);
+        customerRepository.deleteAll(customers);
+    }
+
+    @Override
+    @Transactional
+    public UserDetailsRes updateUserById(Long id, UserUpdatingReq userUpdatingReq) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        updateUserProfile(user, userUpdatingReq);
+        User updatedUser = userRepository.save(user);
+        return userMapper.toUserDetailsDto(updatedUser);
+    }
+
+    private void updateUserProfile(User user, UserUpdatingReq userUpdatingReq) {
+        setUserInfo(
+            user,
+            userUpdatingReq.getFirstName(),
+            userUpdatingReq.getLastName(),
+            userUpdatingReq.getAddress(),
+            userUpdatingReq.getPhoneNumber(),
+            userUpdatingReq.getEmail(),
+            null,
+            null,
+            null,
+            userUpdatingReq.getIsActive());
+    }
+
+    private void updateUserProfile(User user, UserInfoUpdatingReq userInfoUpdatingReq) {
+        setUserInfo(
+            user,
+            userInfoUpdatingReq.getFirstName(),
+            userInfoUpdatingReq.getLastName(),
+            userInfoUpdatingReq.getAddress(),
+            null,
+            null,
+            userInfoUpdatingReq.getBio(),
+            userInfoUpdatingReq.getAvatar(),
+            userInfoUpdatingReq.getDob(),
+            null
+        );
+    }
+
+    private void setUserInfo(
+        User user,
+        String firstName,
+        String lastName,
+        String address,
+        String phoneNumber,
+        String email,
+        String bio,
+        String avatar,
+        Date dob,
+        Boolean isActive
+    ) {
+        UserProfile existingUserProfile = user.getUserProfile();
+
+        if(firstName != null) {
+            existingUserProfile.setFirstName(firstName);
+        }
+        if(lastName != null) {
+            existingUserProfile.setLastName(lastName);
+        }
+        if(address != null) {
+            existingUserProfile.setAddress(address);
+        }
+        if(phoneNumber != null) {
+            existingUserProfile.setPhoneNumber(phoneNumber);
+        }
+        if(email != null) {
+            user.setEmail(email);
+        }
+        if(bio != null) {
+            existingUserProfile.setBio(bio);
+        }
+        if(avatar != null) {
+            existingUserProfile.setAvatar(avatar);
+        }
+        if(dob != null) {
+            existingUserProfile.setDob(dob);
+        }
+        if(isActive != null) {
+            user.setIsActive(isActive);
+        }
+        user.setUserProfile(existingUserProfile);
     }
 }
