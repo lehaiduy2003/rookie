@@ -75,4 +75,10 @@ public interface CategoryService {
      */
     List<CategoryRes> getTopLevelCategories();
 
+    /**
+     * Retrieves a list of all categories.
+     * @return a list of all categories
+     */
+    List<CategoryRes> getAllCategories();
+
 }
