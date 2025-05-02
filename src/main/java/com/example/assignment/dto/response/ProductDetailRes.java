@@ -17,8 +17,8 @@ public class ProductDetailRes extends ProductRes {
     private UserRes createdBy;
 
     @Builder
-    public ProductDetailRes(Long id, String name, Double price, String imageUrl, Boolean isActive, Double avgRating, Long ratingCount, String description, CategoryRes category, Integer quantity, Date createdOn, Date updatedOn, Set<RatingRes> ratings, UserRes createdBy) {
-        super(id, name, price, imageUrl, isActive, avgRating, ratingCount);
+    public ProductDetailRes(Long id, String name, Double price, String imageUrl, Boolean featured, Boolean isActive, Double avgRating, Long ratingCount, String description, CategoryRes category, Integer quantity, Date createdOn, Date updatedOn, Set<RatingRes> ratings, UserRes createdBy) {
+        super(id, name, price, imageUrl, featured, isActive, avgRating, ratingCount);
         this.description = description;
         this.category = category;
         this.quantity = quantity;

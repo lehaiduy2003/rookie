@@ -23,6 +23,7 @@ public class ProductCreationReq {
     private Integer quantity;
     private String imageUrl;
     private Boolean isActive;
+    private Boolean featured;
 
     // Add any other fields as needed
 }
