@@ -84,10 +84,10 @@ public class ProductServiceImpl extends PagingServiceImpl<ProductRes, Product, L
         Product product = productRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
-        updateProductDetails(product, productUpdatingReq);
-
         // Validate product before saving
         validateProduct(product);
+
+        updateProductDetails(product, productUpdatingReq);
 
         Product updatedProduct = productRepository.save(product);
         return productMapper.toDto(updatedProduct);
@@ -174,6 +174,14 @@ public class ProductServiceImpl extends PagingServiceImpl<ProductRes, Product, L
         }
         if (productUpdatingReq.getIsActive() != null) {
             product.setIsActive(productUpdatingReq.getIsActive());
+        }
+        if (productUpdatingReq.getFeatured() != null) {
+            product.setFeatured(productUpdatingReq.getFeatured());
+        }
+        if(productUpdatingReq.getCategoryId() != null) {
+            Category category = categoryRepository.findById(productUpdatingReq.getCategoryId())
+                .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+            product.setCategory(category);
         }
     }
 
