@@ -15,4 +15,6 @@ public class ProductUpdatingReq {
     private Integer quantity;
     private String imageUrl;
     private Boolean isActive;
+    private Boolean featured;
+    private Long categoryId;
 }

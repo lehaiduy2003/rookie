@@ -101,4 +101,15 @@ public class CategoryController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/all")
+    public ResponseEntity<List<CategoryRes>> getAllCategories() {
+        try {
+            List<CategoryRes> allCategories = categoryService.getAllCategories();
+            return ResponseEntity.ok(allCategories);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }

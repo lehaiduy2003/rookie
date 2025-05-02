@@ -11,6 +11,7 @@ public class ProductRes {
     private String name;
     private Double price;
     private String imageUrl;
+    private Boolean featured;
     private Boolean isActive;
     private Double avgRating;
     private Long ratingCount;

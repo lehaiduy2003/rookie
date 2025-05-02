@@ -158,4 +158,13 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryTreeRes;
     }
 
+    @Override
+    public List<CategoryRes> getAllCategories() {
+        // Fetch all categories from the database
+        List<Category> categories = categoryRepository.findAll();
+        return categories.stream()
+            // Map each category to CategoryRes
+            .map(categoryMapper::toDtoRes)
+            .toList();
+    }
 }
