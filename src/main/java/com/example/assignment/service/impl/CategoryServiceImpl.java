@@ -2,14 +2,18 @@ package com.example.assignment.service.impl;
 
 import com.example.assignment.annotation.Logging;
 import com.example.assignment.dto.request.CategoryCreationReq;
+import com.example.assignment.dto.request.CategoryFilterReq;
 import com.example.assignment.dto.response.CategoryRes;
 import com.example.assignment.dto.response.CategoryTreeRes;
 import com.example.assignment.entity.Category;
 import com.example.assignment.mapper.CategoryMapper;
 import com.example.assignment.repository.CategoryRepository;
 import com.example.assignment.service.CategoryService;
+import com.example.assignment.specification.CategorySpecification;
+import com.example.assignment.util.SpecificationBuilder;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -159,9 +163,14 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<CategoryRes> getAllCategories() {
+    public List<CategoryRes> getAllCategories(CategoryFilterReq categoryFilterReq) {
+        Specification<Category> spec = new SpecificationBuilder<Category>()
+            .addIfNotNull(categoryFilterReq.getName(), CategorySpecification::hasName)
+            .addIfNotNull(categoryFilterReq.getParentId(), CategorySpecification::hasParentId)
+            .addIfNotNull(categoryFilterReq.getDescription(), CategorySpecification::hasDescription)
+            .build();
         // Fetch all categories from the database
-        List<Category> categories = categoryRepository.findAll();
+        List<Category> categories = categoryRepository.findAll(spec);
         return categories.stream()
             // Map each category to CategoryRes
             .map(categoryMapper::toDtoRes)
