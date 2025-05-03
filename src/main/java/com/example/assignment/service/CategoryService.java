@@ -1,6 +1,7 @@
 package com.example.assignment.service;
 
 import com.example.assignment.dto.request.CategoryCreationReq;
+import com.example.assignment.dto.request.CategoryFilterReq;
 import com.example.assignment.dto.response.CategoryRes;
 import com.example.assignment.dto.response.CategoryTreeRes;
 
@@ -79,6 +80,6 @@ public interface CategoryService {
      * Retrieves a list of all categories.
      * @return a list of all categories
      */
-    List<CategoryRes> getAllCategories();
+    List<CategoryRes> getAllCategories(CategoryFilterReq categoryFilterReq);
 
 }

@@ -1,6 +1,7 @@
 package com.example.assignment.controller;
 
 import com.example.assignment.dto.request.CategoryCreationReq;
+import com.example.assignment.dto.request.CategoryFilterReq;
 import com.example.assignment.dto.response.CategoryRes;
 import com.example.assignment.dto.response.CategoryTreeRes;
 import com.example.assignment.service.CategoryService;
@@ -103,10 +104,12 @@ public class CategoryController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/all")
-    public ResponseEntity<List<CategoryRes>> getAllCategories() {
+    @GetMapping
+    public ResponseEntity<List<CategoryRes>> getAllCategories(
+        @Valid @ModelAttribute CategoryFilterReq categoryFilterReq
+        ) {
         try {
-            List<CategoryRes> allCategories = categoryService.getAllCategories();
+            List<CategoryRes> allCategories = categoryService.getAllCategories(categoryFilterReq);
             return ResponseEntity.ok(allCategories);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
