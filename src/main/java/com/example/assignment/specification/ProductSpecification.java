@@ -54,12 +54,17 @@ public class ProductSpecification {
     }
     /**
      * Specification to filter products by rating range.
-     * @param minRating the lower bound of the rating range
-     * @param maxRating the upper bound of the rating range
+     * @param rating the lower bound of the rating range
      * @return a Specification that filters products by rating
      */
-    public static Specification<Product> hasRatingBetween(Double minRating, Double maxRating) {
-        return getBoundarySpec(minRating, maxRating, "avgRating");
+    public static Specification<Product> hasRating(Double rating) {
+        return (root, query, criteriaBuilder) -> {
+            if (rating == null) {
+                return null;
+            } else {
+                return criteriaBuilder.greaterThanOrEqualTo(root.get("avgRating"), rating);
+            }
+        };
     }
 
     /**
@@ -69,19 +74,16 @@ public class ProductSpecification {
      * @return a Specification that filters products by price
      */
     public static Specification<Product> hasPriceBetween(Double minPrice, Double maxPrice) {
-        return getBoundarySpec(minPrice, maxPrice, "price");
-    }
-
-    private static Specification<Product> getBoundarySpec(Double lowerBound, Double higherBound, String target) {
+        String target = "price";
         return (root, query, criteriaBuilder) -> {
-            if (lowerBound == null && higherBound == null) {
+            if (minPrice == null && maxPrice == null) {
                 return null;
-            } else if (lowerBound != null && higherBound != null) {
-                return criteriaBuilder.between(root.get(target), lowerBound, higherBound);
-            } else if (lowerBound != null) {
-                return criteriaBuilder.greaterThanOrEqualTo(root.get(target), lowerBound);
+            } else if (minPrice != null && maxPrice != null) {
+                return criteriaBuilder.between(root.get(target), minPrice, maxPrice);
+            } else if (minPrice != null) {
+                return criteriaBuilder.greaterThanOrEqualTo(root.get(target), minPrice);
             } else {
-                return criteriaBuilder.lessThanOrEqualTo(root.get(target), higherBound);
+                return criteriaBuilder.lessThanOrEqualTo(root.get(target), maxPrice);
             }
         };
     }

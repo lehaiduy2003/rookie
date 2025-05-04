@@ -148,7 +148,6 @@ public class ProductServiceImpl extends PagingServiceImpl<ProductRes, Product, L
                 .addIfNotNull(filterReq.getFeatured(), ProductSpecification::isFeatured)
                 .addIfNotNull(filterReq.getCategoryId(), ProductSpecification::hasCategoryId)
                 .add(ProductSpecification.hasPriceBetween(filterReq.getMinPrice(), filterReq.getMaxPrice()))
-                .add(ProductSpecification.hasRatingBetween(filterReq.getMinRating(), filterReq.getMaxRating()))
                 .build();
             return getMany(spec, pageNo, pageSize, sortDir, sortBy);
         } catch (Exception e) {

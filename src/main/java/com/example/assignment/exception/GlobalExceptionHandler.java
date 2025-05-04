@@ -47,4 +47,14 @@ public class GlobalExceptionHandler {
                 .build();
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorRes);
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorRes> handleIllegalArgument(IllegalArgumentException ex) {
+        ErrorRes errorRes = ErrorRes.builder()
+                .error("Illegal Argument")
+                .cause("An illegal argument was provided")
+                .message(ex.getClass().getName() + ": " + ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorRes);
+    }
 }
