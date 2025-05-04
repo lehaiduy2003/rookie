@@ -103,7 +103,6 @@ public class CategoryController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<CategoryRes>> getAllCategories(
         @Valid @ModelAttribute CategoryFilterReq categoryFilterReq
