@@ -14,11 +14,13 @@ import com.example.assignment.util.PasswordUtil;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
+@Order(1)
 public class UserSeed implements CommandLineRunner {
 
     private final UserRepository userRepository;
@@ -31,7 +33,7 @@ public class UserSeed implements CommandLineRunner {
         return UserCreationReq.builder()
             .email(email)
             .phoneNumber(phoneNumber)
-            .password(passwordUtil.encode(password))
+            .password(password)
             .firstName(firstName)
             .lastName(lastName)
             .address(address)
@@ -58,7 +60,7 @@ public class UserSeed implements CommandLineRunner {
             UserCreationReq adminReq = buildUserCreationReq(
                 "admin@example.com",
                 "123456789",
-                "admin",
+                "admin123",
                 "admin",
                 "Admin",
                 "Admin Address",
@@ -68,6 +70,7 @@ public class UserSeed implements CommandLineRunner {
 
             UserProfile adminProfile = buildUserProfile(adminReq);
             User adminUser = userMapper.toEntity(adminReq, adminProfile);
+            adminUser.setPassword(passwordUtil.encode(adminReq.getPassword()));
             adminUser.setUserProfile(adminProfile);
             adminProfile.setUser(adminUser);
             userRepository.save(adminUser);
@@ -78,7 +81,7 @@ public class UserSeed implements CommandLineRunner {
             UserCreationReq customerReq = buildUserCreationReq(
                 "customer@example.com",
                 "987654321",
-                "customer",
+                "customer123",
                 "customer",
                 "Customer",
                 "Customer Address",
@@ -88,9 +91,11 @@ public class UserSeed implements CommandLineRunner {
 
             UserProfile customerProfile = buildUserProfile(customerReq);
             Customer customer = userMapper.toCustomer(customerReq, customerProfile);
+            customer.setPassword(passwordUtil.encode(customerReq.getPassword()));
             customer.setUserProfile(customerProfile);
             customerProfile.setUser(customer);
             customerRepository.save(customer);
+
         }
     }
 }
