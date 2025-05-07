@@ -60,7 +60,7 @@ public interface CategoryService {
      * @param categoryId the root category ID for the tree structure
      * @return a tree structure of categories under the specified parent ID
      */
-    List<CategoryTreeRes> getCategoryTreeByParentId(Long categoryId);
+    List<CategoryTreeRes> getCategoryTreeById(Long categoryId);
 
 
     /**

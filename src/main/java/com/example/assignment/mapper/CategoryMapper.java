@@ -6,6 +6,8 @@ import com.example.assignment.entity.Category;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
+
 /**
  * Mapper interface for converting between Category entity and DTOs.
  * This mapper is used to convert CategoryCreationReq to Category entity and Category entity to CategoryRes.
@@ -25,6 +27,20 @@ public interface CategoryMapper {
      * @return the CategoryRes DTO
      */
     @Mapping(target = "parentId", source = "parent.id")
-    CategoryRes toDtoRes(Category category);
+    CategoryRes toDto(Category category);
+
+    /**
+     * Converts a CategoryRes DTO to a Category entity.
+     * @param categoryRes the CategoryRes DTO
+     * @return the Category entity
+     */
+    Category toEntity(CategoryRes categoryRes);
+
+    /**
+     * Converts a list of Category entities to a list of CategoryRes DTOs.
+     * @param categories the list of Category entities
+     * @return the list of CategoryRes DTOs
+     */
+    List<CategoryRes> toDtos(List<Category> categories);
 
 }

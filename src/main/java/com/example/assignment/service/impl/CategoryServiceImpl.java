@@ -6,6 +6,8 @@ import com.example.assignment.dto.request.CategoryFilterReq;
 import com.example.assignment.dto.response.CategoryRes;
 import com.example.assignment.dto.response.CategoryTreeRes;
 import com.example.assignment.entity.Category;
+import com.example.assignment.exception.ResourceConflictException;
+import com.example.assignment.exception.ResourceNotFoundException;
 import com.example.assignment.mapper.CategoryMapper;
 import com.example.assignment.repository.CategoryRepository;
 import com.example.assignment.service.CategoryService;
@@ -29,10 +31,7 @@ public class CategoryServiceImpl implements CategoryService {
     public List<CategoryRes> getTopLevelCategories() {
         // Fetch root categories (categories with no parent)
         List<Category> rootCategories = categoryRepository.findCategoriesByParentIsNull();
-        return rootCategories.stream()
-            // Map each root category to CategoryRes
-            .map(categoryMapper::toDtoRes)
-            .toList();
+        return categoryMapper.toDtos(rootCategories);
     }
 
     @Override
@@ -43,7 +42,7 @@ public class CategoryServiceImpl implements CategoryService {
         // check if parentId is not null and exists in the database to set the parent category
         setParentCategory(category, parentId);
         Category savedCategory = categoryRepository.save(category);
-        return categoryMapper.toDtoRes(savedCategory);
+        return categoryMapper.toDto(savedCategory);
     }
 
     @Override
@@ -58,7 +57,7 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         Category category = categoryRepository.findById(categoryId).orElseThrow(
-            () -> new IllegalArgumentException("Category not found")
+            () -> new ResourceNotFoundException("Category not found")
         );
         // update category details if they are not null
         category.setName(categoryCreationReq.getName() != null ? name : category.getName());
@@ -66,14 +65,14 @@ public class CategoryServiceImpl implements CategoryService {
         // check if parentId is not null and exists in the database to set the parent category
         setParentCategory(category, parentId);
         Category updatedCategory = categoryRepository.save(category);
-        return categoryMapper.toDtoRes(updatedCategory);
+        return categoryMapper.toDto(updatedCategory);
     }
 
     @Override
     @Transactional
     public void forceDeleteCategoryById(Long categoryId) {
         if(isCategoryNotExists(categoryId)) {
-            throw new IllegalArgumentException("Category not found");
+            throw new ResourceNotFoundException("Category not found");
         }
         categoryRepository.deleteById(categoryId);
     }
@@ -82,11 +81,11 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public void deleteCategoryById(Long categoryId) {
         if(isCategoryNotExists(categoryId)) {
-            throw new IllegalArgumentException("Category not found");
+            throw new ResourceNotFoundException("Category not found");
         }
         // If the category has child categories, stop the deletion
         if (hasChildCategories(categoryId)) {
-            throw new IllegalArgumentException("Category has child categories and cannot be deleted");
+            throw new ResourceConflictException("Category has child categories and cannot be deleted");
         }
         // Delete the category
         categoryRepository.deleteById(categoryId);
@@ -94,7 +93,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryRes getCategoryById(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
-            .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
 
         // Map the category entity to DTO
         return CategoryRes.builder()
@@ -106,9 +105,9 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<CategoryTreeRes> getCategoryTreeByParentId(Long categoryId) {
+    public List<CategoryTreeRes> getCategoryTreeById(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
-            .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
 
         // Build the tree structure starting from the given category
         CategoryTreeRes categoryTree = buildCategoryTree(category);
@@ -134,11 +133,13 @@ public class CategoryServiceImpl implements CategoryService {
     private void setParentCategory(Category category, Long parentId) {
         if (parentId != null) {
             Category parentCategory = categoryRepository.findById(parentId)
-                .orElseThrow(() -> new IllegalArgumentException("Parent category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Parent category not found"));
             category.setParent(parentCategory);
         }
     }
 
+    // Check if any child categories exist for the given category ID
+    // This method is used to prevent deletion of categories that have child categories
     private boolean hasChildCategories(Long categoryId) {
         return !categoryRepository.findCategoriesByParent_Id(categoryId).isEmpty();
     }
@@ -171,9 +172,6 @@ public class CategoryServiceImpl implements CategoryService {
             .build();
         // Fetch all categories from the database
         List<Category> categories = categoryRepository.findAll(spec);
-        return categories.stream()
-            // Map each category to CategoryRes
-            .map(categoryMapper::toDtoRes)
-            .toList();
+        return categoryMapper.toDtos(categories);
     }
 }

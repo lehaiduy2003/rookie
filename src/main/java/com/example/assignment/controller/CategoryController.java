@@ -96,7 +96,7 @@ public class CategoryController {
     @GetMapping("/tree/{categoryId}")
     public ResponseEntity<List<CategoryTreeRes>> getCategoryTreeByParentId(@PathVariable Long categoryId) {
         try {
-            List<CategoryTreeRes> categoryTree = categoryService.getCategoryTreeByParentId(categoryId);
+            List<CategoryTreeRes> categoryTree = categoryService.getCategoryTreeById(categoryId);
             return ResponseEntity.ok(categoryTree);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();

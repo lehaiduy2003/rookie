@@ -7,17 +7,15 @@ import com.example.assignment.dto.request.UserCreationReq;
 import com.example.assignment.dto.response.AuthRes;
 import com.example.assignment.dto.response.UserDetailsRes;
 import com.example.assignment.entity.User;
+import com.example.assignment.entity.UserProfile;
 import com.example.assignment.enums.Role;
 import com.example.assignment.exception.ExistingResourceException;
-import com.example.assignment.exception.ResourceNotFoundException;
 import com.example.assignment.exception.UnAuthorizedException;
 import com.example.assignment.service.AuthService;
 import com.example.assignment.service.UserService;
 import com.example.assignment.util.CookieUtil;
 import com.example.assignment.provider.JwtProvider;
 import com.example.assignment.util.PasswordUtil;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -67,7 +65,7 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         // Create the user
-        userService.createUser(userCreationReq);
+        UserDetailsRes userDetailsRes = userService.createUser(userCreationReq);
 
         // Load user details for token generation
         User user = (User) loadUserByUsername(registerReq.getEmail());
@@ -82,22 +80,14 @@ public class AuthServiceImpl implements AuthService {
         // Set authentication in a security context
         setAuth(user, request);
 
-        // Get user details
-        UserDetailsRes userDetailsRes = userService.getUserById(user.getId());
-
         // Return authentication response
         return new AuthRes(userDetailsRes, accessToken, refreshToken);
     }
 
     @Override
     public AuthRes login(LoginReq loginReq, HttpServletRequest request, HttpServletResponse response) {
-        // Load user from database
+        // Load user from database, if not found, the loadUserByUsername method will throw an exception
         User user = (User) loadUserByUsername(loginReq.getEmail());
-
-        // Check if a user exists
-        if (user == null) {
-            throw new ResourceNotFoundException("User's email not found");
-        }
 
         // Verify password
         if (!passwordUtil.matches(loginReq.getPassword(), user.getPassword())) {
@@ -115,7 +105,7 @@ public class AuthServiceImpl implements AuthService {
         cookieUtil.addRefreshTokenCookie(response, refreshToken);
 
         // Get user details
-        UserDetailsRes userDetailsRes = userService.getUserById(user.getId());
+        UserDetailsRes userDetailsRes = buildUserDetailsRes(user);
 
         // Return authentication response
         return new AuthRes(userDetailsRes, accessToken, refreshToken);
@@ -139,35 +129,28 @@ public class AuthServiceImpl implements AuthService {
             throw new UnAuthorizedException("Refresh token not found");
         }
 
-        try {
-            // Extract username from a refresh token
-            String username = jwtProvider.extractUsername(refreshToken);
+        // Extract username from a refresh token
+        String username = jwtProvider.extractUsername(refreshToken);
 
-            if (username == null) {
-                throw new UnAuthorizedException("Invalid refresh token");
-            }
-            // Load user details
-            User user = (User) loadUserByUsername(username);
+        if (username == null) {
+            throw new UnAuthorizedException("Invalid payload");
+        }
+        // Load user details
+        User user = (User) loadUserByUsername(username);
 
-            // Validate refresh token
-            if (!Boolean.TRUE.equals(jwtProvider.validateToken(refreshToken))) {
-                throw new UnAuthorizedException("Invalid refresh token");
-            }
-
-            // Generate a new access token
-            String accessToken = jwtProvider.generateAccessToken(user);
-
-            // Set authentication in a security context
-            setAuth(user, request);
-
-            // Return only the access token
-            return accessToken;
-
-        } catch (ExpiredJwtException e) {
-            throw new UnAuthorizedException("Refresh token expired");
-        } catch (JwtException e) {
+        // Validate refresh token
+        if (!Boolean.TRUE.equals(jwtProvider.validateToken(refreshToken))) {
             throw new UnAuthorizedException("Invalid refresh token");
         }
+
+        // Generate a new access token
+        String accessToken = jwtProvider.generateAccessToken(user);
+
+        // Set authentication in a security context
+        setAuth(user, request);
+
+        // Return only the access token
+        return accessToken;
     }
 
     private void setAuth(User user, HttpServletRequest request) {
@@ -179,5 +162,25 @@ public class AuthServiceImpl implements AuthService {
         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
+    }
+
+    private UserDetailsRes buildUserDetailsRes(User user) {
+        UserProfile userProfile = user.getUserProfile();
+        return UserDetailsRes.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .firstName(userProfile.getFirstName())
+                .lastName(userProfile.getLastName())
+                .avatar(userProfile.getAvatar())
+                .phoneNumber(userProfile.getPhoneNumber())
+                .address(userProfile.getAddress())
+                .bio(userProfile.getBio())
+                .dob(userProfile.getDob())
+                .createdOn(user.getCreatedOn())
+                .updatedOn(user.getUpdatedOn())
+                .memberTier(user.getRole().getValue())
+                .role(user.getRole().name())
+                .isActive(user.getIsActive())
+                .build();
     }
 }

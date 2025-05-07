@@ -9,6 +9,8 @@ import com.example.assignment.dto.response.ProductDetailRes;
 import com.example.assignment.dto.response.ProductRes;
 import com.example.assignment.entity.Category;
 import com.example.assignment.entity.Product;
+import com.example.assignment.exception.ResourceConflictException;
+import com.example.assignment.exception.ResourceNotFoundException;
 import com.example.assignment.mapper.ProductMapper;
 import com.example.assignment.repository.BaseRepository;
 import com.example.assignment.repository.CategoryRepository;
@@ -56,7 +58,7 @@ public class ProductServiceImpl extends PagingServiceImpl<ProductRes, Product, L
         }
 
         Category category = categoryRepository.findById(categoryId)
-            .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
 
         Product product = productMapper.toEntity(productCreationReq);
         product.setCategory(category);
@@ -69,10 +71,11 @@ public class ProductServiceImpl extends PagingServiceImpl<ProductRes, Product, L
         return productMapper.toDto(savedProduct);
     }
 
+    @Transactional
     @Override
     public ProductDetailRes getProductById(Long id) {
         Product product = productRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
         return productMapper.toDetailsDto(product);
     }
@@ -82,12 +85,12 @@ public class ProductServiceImpl extends PagingServiceImpl<ProductRes, Product, L
     @Transactional
     public ProductRes updateProductById(Long id, ProductUpdatingReq productUpdatingReq) {
         Product product = productRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+
+        updateProductDetails(product, productUpdatingReq);
 
         // Validate product before saving
         validateProduct(product);
-
-        updateProductDetails(product, productUpdatingReq);
 
         Product updatedProduct = productRepository.save(product);
         return productMapper.toDto(updatedProduct);
@@ -97,11 +100,11 @@ public class ProductServiceImpl extends PagingServiceImpl<ProductRes, Product, L
     @Transactional
     public void deleteProductById(Long id) {
         Product product = productRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
         // Check if a product has ratings
         if (product.getRatings() != null && !product.getRatings().isEmpty()) {
-            throw new IllegalStateException("Product with ratings cannot be deleted. Use archive option instead.");
+            throw new ResourceConflictException("Product with ratings cannot be deleted. Use archive option instead.");
         }
 
         productRepository.delete(product);
@@ -111,10 +114,10 @@ public class ProductServiceImpl extends PagingServiceImpl<ProductRes, Product, L
     @Transactional
     public ProductRes updateProductCategoryById(Long id, Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
-            .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
 
         Product product = productRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
         product.setCategory(category);
 
@@ -129,7 +132,7 @@ public class ProductServiceImpl extends PagingServiceImpl<ProductRes, Product, L
     @Transactional
     public void updateToFeaturedProduct(Long id, Boolean isFeatured) {
         Product product = productRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+            .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
         product.setFeatured(isFeatured);
 
@@ -151,7 +154,7 @@ public class ProductServiceImpl extends PagingServiceImpl<ProductRes, Product, L
                 .build();
             return getMany(spec, pageNo, pageSize, sortDir, sortBy);
         } catch (Exception e) {
-            throw new IllegalArgumentException("No products found");
+            throw new ResourceNotFoundException("No products found");
         }
     }
 
@@ -179,7 +182,7 @@ public class ProductServiceImpl extends PagingServiceImpl<ProductRes, Product, L
         }
         if(productUpdatingReq.getCategoryId() != null) {
             Category category = categoryRepository.findById(productUpdatingReq.getCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
             product.setCategory(category);
         }
     }
