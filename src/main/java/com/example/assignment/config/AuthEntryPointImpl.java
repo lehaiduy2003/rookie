@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
@@ -29,6 +30,7 @@ public class AuthEntryPointImpl implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException arg2) throws IOException {
         logger.info("Pre-authenticated entry point called. Rejecting access");
-        response.sendError(401, "Unauthorized");
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.getWriter().write("You are not authorized to access this resource");
     }
 }
