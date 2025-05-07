@@ -22,6 +22,7 @@ import com.example.assignment.repository.UserRepository;
 import com.example.assignment.service.impl.CategoryServiceImpl;
 import com.example.assignment.service.impl.ProductServiceImpl;
 import com.example.assignment.service.impl.UserServiceImpl;
+import com.example.assignment.util.PasswordUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -86,6 +87,9 @@ class AuditProviderTest {
     private User adminUser;
 
     @Mock
+    private PasswordUtil passwordUtil;
+
+    @Mock
     private User customerUser;
 
     @Mock
@@ -128,7 +132,7 @@ class AuditProviderTest {
         // Setup category mapper
         Category newCategory = new Category();
         when(categoryMapper.toEntity(categoryCreationReq)).thenReturn(newCategory);
-        when(categoryMapper.toDtoRes(any(Category.class))).thenReturn(null); // Not used in this test
+        when(categoryMapper.toDto(any(Category.class))).thenReturn(null); // Not used in this test
 
         // Setup category repository
         when(categoryRepository.save(any(Category.class))).thenAnswer(invocation -> {
@@ -208,6 +212,7 @@ class AuditProviderTest {
 
         // Setup user profile
         UserProfile userProfile = new UserProfile();
+        when(passwordUtil.encode(any(String.class))).thenReturn("encodedPassword");
         when(userProfileMapper.toEntity(any(UserCreationReq.class))).thenReturn(userProfile);
 
         // Setup customer
@@ -250,7 +255,7 @@ class AuditProviderTest {
         // Setup user profile
         UserProfile userProfile = new UserProfile();
         when(userProfileMapper.toEntity(any(UserCreationReq.class))).thenReturn(userProfile);
-
+        when(passwordUtil.encode(any(String.class))).thenReturn("encodedPassword");
         // Setup customer
         Customer customer = new Customer();
         when(userMapper.toCustomer(any(UserCreationReq.class), any(UserProfile.class))).thenReturn(customer);
