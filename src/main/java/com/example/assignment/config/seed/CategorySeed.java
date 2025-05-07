@@ -2,19 +2,19 @@ package com.example.assignment.config.seed;
 
 import com.example.assignment.entity.Category;
 import com.example.assignment.repository.CategoryRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Component
+@Order(2)
+@RequiredArgsConstructor
 public class CategorySeed implements CommandLineRunner {
     private final CategoryRepository categoryRepository;
-
-    public CategorySeed(CategoryRepository categoryRepository) {
-        this.categoryRepository = categoryRepository;
-    }
 
     @Override
     @Transactional
@@ -115,10 +115,23 @@ public class CategorySeed implements CommandLineRunner {
             .parent(womenClothing)
             .build();
 
+        // Add two categories with no parent and no children
+        Category books = Category.builder()
+            .name("Books")
+            .description("Various genres of books")
+            .build();
+
+        Category furniture = Category.builder()
+            .name("Furniture")
+            .description("Home and office furniture")
+            .build();
+
+
         // Save the new levels
         categoryRepository.saveAll(List.of(
             smartphones, accessories, gamingLaptops, ultrabooks,
-            formalWear, casualWear, dresses, accessoriesWomen
+            formalWear, casualWear, dresses, accessoriesWomen,
+            books, furniture
         ));
     }
 }

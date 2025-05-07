@@ -1,6 +1,7 @@
 package com.example.assignment.exception;
 
 import com.example.assignment.dto.response.ErrorRes;
+import org.hibernate.LazyInitializationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -56,5 +57,25 @@ public class GlobalExceptionHandler {
                 .message(ex.getClass().getName() + ": " + ex.getMessage())
                 .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorRes);
+    }
+
+    @ExceptionHandler(LazyInitializationException.class)
+    public ResponseEntity<ErrorRes> handleLazyInitialization(LazyInitializationException ex) {
+        ErrorRes errorRes = ErrorRes.builder()
+                .error("Lazy Initialization Exception")
+                .cause("An error occurred while initializing a lazy-loaded entity")
+                .message(ex.getClass().getName() + ": " + ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorRes);
+    }
+
+    @ExceptionHandler(ResourceConflictException.class)
+    public ResponseEntity<ErrorRes> handleResourceConflict(ResourceConflictException ex) {
+        ErrorRes errorRes = ErrorRes.builder()
+                .error("Resource Conflict")
+                .cause("A conflict occurred with the requested resource")
+                .message(ex.getClass().getName() + ": " + ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorRes);
     }
 }

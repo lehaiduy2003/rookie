@@ -11,6 +11,7 @@ import com.example.assignment.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@Order(4)
 public class RatingSeed implements CommandLineRunner {
     private final RatingRepository ratingRepository;
     private final ProductRepository productRepository;
@@ -53,8 +55,10 @@ public class RatingSeed implements CommandLineRunner {
 
         List<Rating> ratings = new ArrayList<>();
 
+        int len = Math.min(products.size(), 2);
+
         // Create ratings for each product
-        for (int i = 0; i < Math.min(products.size(), 3); i++) {
+        for (int i = 0; i < len; i++) {
             Product product = products.get(i);
 
             // Create a rating with score 5

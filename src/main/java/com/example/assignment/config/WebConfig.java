@@ -1,7 +1,8 @@
 package com.example.assignment.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.web.cors.CorsConfiguration;
@@ -21,10 +22,10 @@ import static com.example.assignment.constant.SecurityURL.PUBLIC_URLS;
  * It implements the WebMvcConfigurer interface to customize the default settings.
  */
 @Configuration
+@RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
-    @Value("${spring.profiles.active}")
-    private String environment;
+    private final Environment environment;
     private static final String[] ALLOWED_ORIGINS = {"http://localhost:3000", "http://localhost:5173"};
 
     /**
@@ -66,7 +67,8 @@ public class WebConfig implements WebMvcConfigurer {
      * @throws Exception if an error occurs during configuration
      */
     public void configureCSRF(HttpSecurity http) throws Exception {
-        if (environment != null && environment.equals("development")) {
+        if (environment != null && environment.getActiveProfiles().length > 0
+            && environment.getActiveProfiles()[0].equals("dev")) {
             http.csrf(AbstractHttpConfigurer::disable);
         } else {
             http.csrf(csrf -> csrf.ignoringRequestMatchers(PUBLIC_URLS));

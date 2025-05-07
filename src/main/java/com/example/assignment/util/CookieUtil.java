@@ -3,7 +3,9 @@ package com.example.assignment.util;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 /**
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Component;
  * Provides methods for adding, clearing, and extracting cookies.
  */
 @Component
+@RequiredArgsConstructor
 public class CookieUtil {
 
     @Value("${jwt.refresh-token.expiration}")
@@ -21,11 +24,12 @@ public class CookieUtil {
 
     private static final String PATH = "/api/v1/auth/refresh";
 
-    @Value("${spring.profiles.active}") // development
-    private String environment;
+
+    private final Environment environment;
 
     private boolean isSecure() {
-        return environment != null && environment.equals("production");
+        return environment != null && environment.getActiveProfiles().length > 0
+            && environment.getActiveProfiles()[0].equals("prod");
     }
 
     /**

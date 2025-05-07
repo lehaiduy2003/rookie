@@ -1,0 +1,11 @@
+# database configuration
+spring.datasource.url=your_data_source_URL
+spring.datasource.username=your_data_source_username
+spring.datasource.password=your_data_source_password
+spring.datasource.driver-class-name=your_data_source_driver
+
+
+# JWT Configuration
+jwt.secret=your_secret_key
+jwt.access-token.expiration=your_access_expiration
+jwt.refresh-token.expiration=your_refresh_expiration
